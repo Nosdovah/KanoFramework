@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kano-HoQ Integrator | Professional Engineering Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            font-size: 14px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Desain Atap HoQ (The Roof) */
+        .hoq-roof {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 150px 100px 150px;
+            border-color: transparent transparent #e2e8f0 transparent;
+            margin: 0 auto -2px auto;
+            position: relative;
+        }
+
+        /* Diagonal labels for Technical Requirements */
+        .vertical-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+        }
+
+        .kano-label-A {
+            color: #059669;
+            font-weight: bold;
+        }
+
+        .kano-label-O {
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .kano-label-M {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .hoq-table th,
+        .hoq-table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .row-header {
+            text-align: left !important;
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .relation-strong {
+            color: #1e40af;
+            font-weight: 900;
+        }
+
+        /* ◎ = 9 */
+        .relation-medium {
+            color: #10b981;
+            font-weight: 900;
+        }
+
+        /* ○ = 3 */
+        .relation-weak {
+            color: #f59e0b;
+            font-weight: 900;
+        }
+
+        /* △ = 1 */
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- NAV BAR -->
+    <nav class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-microchip text-blue-400 text-xl"></i>
+                    <span class="text-lg font-bold tracking-tight">QFD <span class="text-blue-400">System</span></span>
+                </div>
+                <div class="flex space-x-1">
+                    <button onclick="switchTab('studi-kasus')"
+                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800"
+                        id="btn-studi-kasus">Contoh Studi Kasus</button>
+                    <button onclick="switchTab('kano-module')"
+                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800"
+                        id="btn-kano-module">Analisis Kano</button>
+                    <button onclick="switchTab('hoq-module')"
+                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800"
+                        id="btn-hoq-module">House of Quality</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full p-4">
+
+        <!-- TAB 1: STUDI KASUS -->
+        <section id="studi-kasus" class="tab-content active">
+            <div class="bg-white rounded-xl shadow-sm p-8 border border-slate-200">
+                <h1 class="text-3xl font-extrabold text-slate-800 mb-6">Analisis Strategis: PT Nusantara Roastery &
+                    Smart Hub</h1>
+
+                <div
+                    class="prose max-w-none text-slate-700 leading-relaxed space-y-8 text-sm md:text-base text-justify">
+
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 border-b pb-2 mb-4">Babak 1: Era Keemasan dan
+                            Ekspansi Ambisius</h3>
+                        <p>
+                            Lima tahun lalu, Pak Baskoro—seorang mantan direktur bank yang memilih pensiun
+                            dini—mendirikan <strong>Nusantara Roastery</strong>. Awalnya, bisnis ini adalah fasilitas
+                            penyangraian kopi (roastery) B2B yang menyuplai biji kopi berkualitas ke puluhan kedai kopi
+                            independen di ibu kota. Karena dedikasi Pak Baskoro pada profil sangrai yang presisi dan
+                            hubungannya yang etis dengan petani lokal, bisnis ini meledak.
+                        </p>
+                        <p class="mt-3">
+                            Tahun lalu, tergiur oleh tren digitalisasi, pemegang saham menyuntikkan dana besar. Pak
+                            Baskoro mengekspansi bisnisnya menjadi "Nusantara Roastery & Smart Hub". Ia membangun sebuah
+                            <em>flagship cafe</em> megah berlantai tiga bergaya industrial, sekaligus meluncurkan
+                            aplikasi seluler bernama <strong>"NusaBrew App"</strong>. Aplikasi ini ditujukan untuk
+                            pelanggan B2C agar bisa berlangganan biji kopi bulanan yang dikirim langsung ke rumah, serta
+                            untuk memesan minuman secara <em>pick-up</em> di flagship cafe mereka.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                        <h3 class="text-xl font-bold text-slate-900 mb-4">Babak 2: Rapat Darurat di Hari Senin yang
+                            Kacau</h3>
+                        <p>
+                            Q3 tahun ini menjadi mimpi buruk. Retensi pelanggan B2B (kedai kopi) turun 25%, rating
+                            NusaBrew App anjlok ke 2.1 bintang di App Store, dan omzet harian <em>flagship cafe</em>
+                            stagnan. Pak Baskoro memanggil seluruh kepala divisinya ke ruang rapat. Suasana sangat
+                            tegang.
+                        </p>
+                        <p class="mt-3 italic text-slate-600 border-l-4 border-slate-300 pl-4">
+                            "Kita ini kehilangan arah!" gebrakan tangan Pak Baskoro memecah keheningan. "Bulan lalu kita
+                            bakar uang untuk promo gratis ongkir di aplikasi, tapi kenapa <em>churn rate</em> (pelanggan
+                            kabur) malah naik?"
+                        </p>
+                        <p class="mt-3">
+                            <strong>Rina (Head of Marketing)</strong> langsung membela diri. "Pak, masalahnya flagship
+                            cafe kita kurang <em>instagrammable</em>. Lampu neon di toilet lantai dua itu warnanya biru,
+                            di kamera jadinya kusam. Harusnya kita ganti warna <em>warm white</em>. Terus, seragam
+                            barista kita warnanya abu-abu, kurang mencolok untuk masuk TikTok. Ah, satu lagi Pak, tren
+                            sekarang itu makan seblak dan croffle, cafe kita cuma jual pastry, wajar orang bosan!"
+                        </p>
+                        <p class="mt-3">
+                            <strong>Dimas (IT Lead)</strong> mendengus kesal. "Itu urusan marketing. Kalau soal
+                            aplikasi, tim saya sudah buat fitur canggih. User bisa pilih profil suhu air seduhan! Kalau
+                            ratingnya jelek, itu karena <em>user</em>-nya saja yang gaptek, tidak ngerti cara pakainya."
+                        </p>
+                        <p class="mt-3">
+                            <strong>Reza (Operations Manager)</strong> ikut menimpali sambil memijat pelipisnya.
+                            "Masalah utamanya itu di parkiran, Pak! Sejak pasar kaget di seberang buka tiap akhir pekan,
+                            tukang parkir mereka suka mengarahkan mobil ke halaman kita. Pelanggan kita yang mau ambil
+                            kopi dari aplikasi marah-marah karena nggak kebagian parkir. Belum lagi mesin
+                            <em>espresso</em> di lantai satu suaranya berisik sekali seperti mesin genset, staf kita
+                            sampai harus teriak kalau ngomong dengan pelanggan."
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 border-b pb-2 mb-4">Babak 3: Data Mentah dari
+                            Tumpukan Komplain</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                                <span class="text-xs font-bold text-red-500 uppercase tracking-wider">Tiket CS #8821
+                                    (B2B Client)</span>
+                                <p class="text-sm mt-2 text-slate-700 italic">"Saya langganan biji kopi house blend
+                                    kalian sudah 2 tahun. Kenapa tiga pengiriman terakhir profil roasting-nya sangat
+                                    tidak konsisten? Terkadang terlalu gelap (gosong), terkadang asam sekali."</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                                <span class="text-xs font-bold text-red-500 uppercase tracking-wider">App Review
+                                    (NusaBrew App)</span>
+                                <p class="text-sm mt-2 text-slate-700 italic">"Aplikasi SAMPAH! Pas mau checkout
+                                    langganan biji kopi bulanan dan bayar pakai e-wallet, loadingnya muter-muter terus
+                                    sampai timeout."</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                                <span class="text-xs font-bold text-red-500 uppercase tracking-wider">Google Maps Review
+                                    (Flagship Cafe)</span>
+                                <p class="text-sm mt-2 text-slate-700 italic">"Tempatnya enak buat WFH, kopinya juara.
+                                    TAPI, colokan listrik cuma ada di meja panjang tengah. Saya duduk jam 2 siang, jam 4
+                                    baterai laptop habis."</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                                <span class="text-xs font-bold text-red-500 uppercase tracking-wider">Tiket CS #8904
+                                    (B2C Subscriber)</span>
+                                <p class="text-sm mt-2 text-slate-700 italic">"Pengiriman paket langganan biasanya 2
+                                    hari sampai, sekarang bisa 5-6 hari. Padahal saya butuh cepat karena stok di rumah
+                                    habis."</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                                <span class="text-xs font-bold text-green-600 uppercase tracking-wider">Email Apresiasi
+                                    Pelanggan</span>
+                                <p class="text-sm mt-2 text-slate-700 italic">"Halo, saya kemarin iseng scan QR code
+                                    kecil di kemasan kopi edisi Gayo. Muncul video pendek dokumenter tentang Pak Harun,
+                                    petani kopinya. Keren banget!"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-100 p-6 rounded-xl border-l-8 border-amber-500 mt-8">
+                        <h3 class="text-lg font-bold text-amber-900 mb-2"><i class="fas fa-tasks mr-2"></i> Instruksi
+                            Tugas Analis:</h3>
+                        <ol class="list-decimal list-inside text-sm text-amber-900 mt-4 space-y-2 font-medium">
+                            <li>Baca narasi dan komplain mentah.</li>
+                            <li>Buka tab <strong>"Analisis Kano"</strong>. Petakan Masalah ke dalam Fitur Solusi.</li>
+                            <li>Lakukan uji klasifikasi Kano untuk memfilter prioritas.</li>
+                            <li>Lanjutkan ke <strong>"House of Quality"</strong> untuk menentukan spesifikasi teknis.
+                            </li>
+                        </ol>
+                    </div>
+
+                </div>
+
+                <div class="mt-10 flex justify-end">
+                    <button onclick="switchTab('kano-module')"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all shadow-md">Mulai
+                        Filter Masalah & Masuk ke Kano &rarr;</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: MODUL KANO -->
+        <section id="kano-module" class="tab-content">
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+                <div id="kano-step-1" class="kano-step active">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-slate-800">1. Identifikasi Masalah & Fitur Solusi</h2>
+                        <span class="text-xs font-bold text-slate-400">STEP 1 OF 3</span>
+                    </div>
+
+                    <!-- Form Input Masalah & Solusi -->
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Masalah (Voice of
+                                    Customer)</label>
+                                <textarea id="problem-input"
+                                    placeholder="Contoh: Baterai laptop habis karena minim colokan..."
+                                    class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none h-20 text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Fitur Solusi
+                                    (Product Feature)</label>
+                                <textarea id="solution-input"
+                                    placeholder="Contoh: Penambahan power socket di setiap meja..."
+                                    class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none h-20 text-sm"></textarea>
+                            </div>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button onclick="addFeaturePair()"
+                                class="bg-slate-800 text-white px-6 py-2 rounded-md hover:bg-slate-700 text-sm font-bold">
+                                <i class="fas fa-plus mr-2"></i> Tambahkan ke Daftar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Daftar Hasil Identifikasi -->
+                    <div id="feature-list" class="space-y-3">
+                        <!-- Data Masalah & Solusi akan muncul di sini -->
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t flex justify-end">
+                        <button onclick="goToKanoStep(2)"
+                            class="bg-blue-600 text-white px-6 py-2 rounded-md font-bold">Lanjut Evaluasi Kano
+                            &rarr;</button>
+                    </div>
+                </div>
+
+                <div id="kano-step-2" class="kano-step">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-slate-800">2. Klasifikasi Kano & Pemetaan</h2>
+                        <button onclick="goToKanoStep(1)" class="text-blue-600 text-sm hover:underline font-bold">&larr;
+                            Kembali ke Daftar</button>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div id="kano-testing-list" class="lg:col-span-7 space-y-4"></div>
+                        <div class="lg:col-span-5 bg-slate-50 p-4 rounded-lg border">
+                            <h3 class="font-bold text-center mb-4 text-slate-700 text-sm">Kano Perceptual Map</h3>
+                            <div
+                                class="relative bg-white p-2 border rounded-lg shadow-inner flex justify-center items-center h-[350px]">
+                                <span
+                                    class="absolute top-2 left-1/2 -translate-x-1/2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Puas
+                                    Jika Ada</span>
+                                <span
+                                    class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Kecewa
+                                    Jika Tdk Ada</span>
+                                <span
+                                    class="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tdk
+                                    Ada</span>
+                                <span
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 rotate-90 text-[9px] font-bold text-slate-400 uppercase tracking-widest">Ada</span>
+                                <canvas id="kanoCanvas" width="400" height="400"
+                                    class="w-full h-full max-w-[300px] max-h-[300px]"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 pt-4 border-t flex justify-end">
+                        <button onclick="switchTab('hoq-module')"
+                            class="bg-blue-600 text-white px-6 py-2 rounded-md font-bold">Bangun House of Quality
+                            &rarr;</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: HOQ MODULE -->
+        <section id="hoq-module" class="tab-content">
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-slate-200 overflow-x-auto">
+                <div class="min-w-[1000px]">
+                    <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center">
+                        <i class="fas fa-home mr-3 text-blue-800"></i> House of Quality Matrix
+                    </h2>
+
+                    <div id="hoq-matrix-root">
+                        <!-- Konten HoQ akan di-generate oleh JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-lg border text-[11px]">
+                    <h4 class="font-bold mb-2">Simbol Hubungan:</h4>
+                    <p>◎ Strong (9) | ○ Medium (3) | △ Weak (1)</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg border text-[11px]">
+                    <h4 class="font-bold mb-2">Prioritas Kano:</h4>
+                    <p>M (Bobot 5) | O (Bobot 3) | A (Bobot 1)</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg border text-[11px]">
+                    <h4 class="font-bold mb-2">Technical Target:</h4>
+                    <p>Raw Weight = Σ (Relationship × Kano Importance)</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { createClient } from "https://esm.sh/@libsql/client/web";
+
+        // ==========================================
+        // 🚨 TURSO CONFIGURATION: PASTE CREDENTIALS HERE
+        // ==========================================
+        const TURSO_URL = "libsql://kanoframework-nosdovah.aws-ap-northeast-1.turso.io";
+        const TURSO_AUTH_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzYyMTg3MzksImlkIjoiMDE5ZDhlZTItZmMwMS03NzQ4LTgwMTItOWFiYTg1YzAwYjA0IiwicmlkIjoiYTYxNzA3MjAtNDk2YS00YmFmLTkwMTctMDIwODVjMzM1MGM2In0.iOu8AqS-KlhZ83rohU70tb55csasVVZ1hg_1Ywhm5muOEbLszL9wDKdqpM6I7E5yWM1x_RCT938RYzCYYtfODg";
+
+        let client = null;
+        try {
+            if (TURSO_URL && !TURSO_URL.includes("YOUR_TURSO_DATABASE_URL")) {
+                client = createClient({
+                    url: TURSO_URL,
+                    authToken: TURSO_AUTH_TOKEN
+                });
+            }
+        } catch (e) {
+            console.error("Failed to initialize Turso Client", e);
+        }
+
+        // State Database
+        let features = []; // Menyimpan objek { dbId, problem, solution }
+        let kanoData = []; // { f:'', d:'', category:'' }
+        let relations = [];
+
+        const relScores = { 'none': 0, 'strong': 9, 'medium': 3, 'weak': 1 };
+        const technicalRequirements = [
+            "Network Bandwidth",
+            "Hardware Durability",
+            "Server Response Time",
+            "Staff Training Hours",
+            "Maintenance Cost",
+            "User Interface Simplicity",
+            "Energy Efficiency"
+        ];
+
+        const kanoMatrix = {
+            "Suka": { "Suka": "Q", "Harus Ada": "A", "Netral": "A", "Dapat Ditoleransi": "A", "Tidak Suka": "O" },
+            "Harus Ada": { "Suka": "R", "Harus Ada": "I", "Netral": "I", "Dapat Ditoleransi": "I", "Tidak Suka": "M" },
+            "Netral": { "Suka": "R", "Harus Ada": "I", "Netral": "I", "Dapat Ditoleransi": "I", "Tidak Suka": "M" },
+            "Dapat Ditoleransi": { "Suka": "R", "Harus Ada": "I", "Netral": "I", "Dapat Ditoleransi": "I", "Tidak Suka": "M" },
+            "Tidak Suka": { "Suka": "R", "Harus Ada": "R", "Netral": "R", "Dapat Ditoleransi": "R", "Tidak Suka": "Q" }
+        };
+
+        async function initDB() {
+            if (!client) {
+                console.warn("Turso Offline: Running locally in-memory.");
+                return;
+            }
+            try {
+                await client.execute(`
+                    CREATE TABLE IF NOT EXISTS kano_items (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        problem TEXT,
+                        solution TEXT,
+                        kano_f TEXT,
+                        kano_d TEXT,
+                        kano_category TEXT,
+                        relations TEXT
+                    )
+                `);
+                await loadData();
+            } catch (e) {
+                console.error("Error init DB:", e);
+                alert("Database Error: Periksa konsol untuk detailnya.");
+            }
+        }
+
+        async function loadData() {
+            if (!client) return;
+            try {
+                const res = await client.execute("SELECT * FROM kano_items ORDER BY id ASC");
+                features = [];
+                kanoData = [];
+                relations = [];
+                res.rows.forEach(r => {
+                    features.push({ dbId: r.id, problem: r.problem, solution: r.solution });
+                    kanoData.push({ f: r.kano_f || '', d: r.kano_d || '', category: r.kano_category || '' });
+                    try {
+                        const rel = JSON.parse(r.relations);
+                        relations.push(rel.length === technicalRequirements.length ? rel : Array(technicalRequirements.length).fill('none'));
+                    } catch (e) {
+                        relations.push(Array(technicalRequirements.length).fill('none'));
+                    }
+                });
+                renderFeaturePairs();
+                renderKanoTesting();
+                renderHoQ();
+            } catch (e) {
+                console.error("Error loading data:", e);
+            }
+        }
+
+        window.switchTab = function (tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (tabId === 'hoq-module') renderHoQ();
+        }
+
+        window.goToKanoStep = function (n) {
+            document.querySelectorAll('.kano-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`kano-step-${n}`).classList.add('active');
+            if (n === 2) {
+                renderKanoTesting();
+                setTimeout(window.drawKanoGraph, 100);
+            }
+        }
+
+        window.addFeaturePair = async function () {
+            const prob = document.getElementById('problem-input').value.trim();
+            const sol = document.getElementById('solution-input').value.trim();
+            if (!prob || !sol) return;
+
+            const initialRelations = Array(technicalRequirements.length).fill('none');
+            let dbId = null;
+
+            if (client) {
+                try {
+                    const res = await client.execute({
+                        sql: "INSERT INTO kano_items (problem, solution, kano_f, kano_d, kano_category, relations) VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
+                        args: [prob, sol, "", "", "", JSON.stringify(initialRelations)]
+                    });
+                    dbId = res.rows[0].id;
+                } catch (e) {
+                    console.error("Failed to insert via Turso", e);
+                    alert("Gagal menyimpan ke database.");
+                    return;
+                }
+            } else {
+                dbId = Date.now(); // fallback dummy ID for local offline test
+            }
+
+            features.push({ dbId, problem: prob, solution: sol });
+            kanoData.push({ f: '', d: '', category: '' });
+            relations.push(initialRelations);
+
+            renderFeaturePairs();
+            document.getElementById('problem-input').value = "";
+            document.getElementById('solution-input').value = "";
+        }
+
+        window.deleteFeaturePair = async function (index) {
+            const dbId = features[index].dbId;
+            if (client) {
+                try {
+                    await client.execute({ sql: "DELETE FROM kano_items WHERE id = ?", args: [dbId] });
+                } catch (e) {
+                    console.error("Failed to delete", e);
+                    alert("Gagal menghapus data.");
+                    return;
+                }
+            }
+
+            features.splice(index, 1);
+            kanoData.splice(index, 1);
+            relations.splice(index, 1);
+            renderFeaturePairs();
+            renderKanoTesting();
+            renderHoQ();
+        }
+
+        function renderFeaturePairs() {
+            const list = document.getElementById('feature-list');
+            list.innerHTML = features.map((f, i) => `
+                <div class="p-3 bg-white border rounded-lg shadow-sm flex flex-col md:flex-row gap-4 items-center">
+                    <div class="flex-1">
+                        <span class="text-[10px] font-bold text-red-500 uppercase">Masalah:</span>
+                        <p class="text-xs text-slate-600">${f.problem}</p>
+                    </div>
+                    <div class="hidden md:block text-slate-300"><i class="fas fa-arrow-right"></i></div>
+                    <div class="flex-1">
+                        <span class="text-[10px] font-bold text-blue-600 uppercase">Solusi:</span>
+                        <p class="text-xs font-semibold text-slate-800">${f.solution}</p>
+                    </div>
+                    <button onclick="deleteFeaturePair(${i})" class="text-slate-300 hover:text-red-500 p-2">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderKanoTesting() {
+            const list = document.getElementById('kano-testing-list');
+            const opts = ["Suka", "Harus Ada", "Netral", "Dapat Ditoleransi", "Tidak Suka"];
+
+            list.innerHTML = features.map((f, i) => `
+                <div class="p-4 bg-slate-50 border rounded-lg">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="font-bold text-blue-800 text-sm">${f.solution}</h4>
+                            <p class="text-[10px] text-slate-500 italic">Menjawab: ${f.problem.substring(0, 50)}...</p>
+                        </div>
+                        <div id="badge-${i}" class="text-[9px] px-2 py-0.5 rounded border uppercase font-black bg-white">UNCLASSIFIED</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-3">
+                        <select onchange="updateKano(${i}, 'f', this.value)" class="text-[11px] p-2 border rounded bg-white outline-none">
+                            <option value="">Jika fitur ADA...</option>
+                            ${opts.map(o => `<option value="${o}" ${kanoData[i].f === o ? 'selected' : ''}>${o}</option>`).join('')}
+                        </select>
+                        <select onchange="updateKano(${i}, 'd', this.value)" class="text-[11px] p-2 border rounded bg-white outline-none">
+                            <option value="">Jika fitur TIDAK ADA...</option>
+                            ${opts.map(o => `<option value="${o}" ${kanoData[i].d === o ? 'selected' : ''}>${o}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+
+            features.forEach((_, i) => updateBadgeColor(i, kanoData[i].category));
+        }
+
+        function updateBadgeColor(idx, cat) {
+            const badge = document.getElementById(`badge-${idx}`);
+            if (!badge || !cat) return;
+            badge.innerText = cat;
+            let colorClass = 'bg-slate-100 text-slate-400';
+            if (cat === 'M') colorClass = 'bg-red-100 text-red-600 border-red-200';
+            if (cat === 'O') colorClass = 'bg-blue-100 text-blue-600 border-blue-200';
+            if (cat === 'A') colorClass = 'bg-green-100 text-green-600 border-green-200';
+            badge.className = `text-[9px] px-2 py-0.5 rounded border uppercase font-black ${colorClass}`;
+        }
+
+        window.updateKano = async function (idx, type, val) {
+            kanoData[idx][type] = val;
+            let cat = kanoData[idx].category || "";
+
+            if (kanoData[idx].f && kanoData[idx].d) {
+                cat = kanoMatrix[kanoData[idx].f]?.[kanoData[idx].d] || "";
+                kanoData[idx].category = cat;
+                updateBadgeColor(idx, cat);
+                window.drawKanoGraph();
+            }
+
+            if (client) {
+                const dbId = features[idx].dbId;
+                try {
+                    await client.execute({
+                        sql: "UPDATE kano_items SET kano_f = ?, kano_d = ?, kano_category = ? WHERE id = ?",
+                        args: [kanoData[idx].f, kanoData[idx].d, cat, dbId]
+                    });
+                } catch (e) {
+                    console.error("Failed to update kano info", e);
+                }
+            }
+        }
+
+        window.drawKanoGraph = function () {
+            const canvas = document.getElementById('kanoCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 400, 400);
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath(); ctx.moveTo(200, 20); ctx.lineTo(200, 380); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(20, 200); ctx.lineTo(380, 200); ctx.stroke();
+            ctx.setLineDash([]);
+
+            kanoData.forEach((d, i) => {
+                if (!d.category) return;
+                let x = 200, y = 200;
+                if (d.category === 'A') { x = 120; y = 120; }
+                if (d.category === 'O') { x = 280; y = 120; }
+                if (d.category === 'M') { x = 280; y = 280; }
+
+                const scatter = (i * 15) % 40 - 20;
+                x += scatter; y += scatter;
+
+                ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fillStyle = (d.category === 'M') ? '#dc2626' : (d.category === 'O') ? '#2563eb' : (d.category === 'A') ? '#10b981' : '#94a3b8';
+                ctx.fill();
+                ctx.fillStyle = '#1e293b';
+                ctx.font = 'bold 10px Inter';
+                ctx.fillText(features[i].solution.substring(0, 10), x + 10, y + 4);
+            });
+        }
+
+        window.setRelation = async function (fIdx, tIdx, scoreKey) {
+            relations[fIdx][tIdx] = scoreKey;
+            renderHoQ();
+
+            if (client) {
+                const dbId = features[fIdx].dbId;
+                try {
+                    await client.execute({
+                        sql: "UPDATE kano_items SET relations = ? WHERE id = ?",
+                        args: [JSON.stringify(relations[fIdx]), dbId]
+                    });
+                } catch (e) {
+                    console.error("Failed to update relations", e);
+                }
+            }
+        }
+
+        function renderHoQ() {
+            const container = document.getElementById('hoq-matrix-root');
+            const validIndices = features.map((_, i) => i).filter(i => kanoData[i]?.category && !['I', 'R', 'Q'].includes(kanoData[i].category));
+
+            if (validIndices.length === 0) {
+                container.innerHTML = `<div class="p-20 text-center text-slate-400 italic">Selesaikan evaluasi Kano untuk fitur prioritas (M, O, atau A)...</div>`;
+                return;
+            }
+
+            const techWeights = technicalRequirements.map((_, tIdx) => {
+                return validIndices.reduce((sum, fIdx) => {
+                    const imp = (kanoData[fIdx].category === 'M') ? 5 : (kanoData[fIdx].category === 'O' ? 3 : 1);
+                    return sum + (imp * relScores[relations[fIdx][tIdx]]);
+                }, 0);
+            });
+
+            const maxWeight = Math.max(...techWeights, 1);
+
+            let html = `
+                <div class="hoq-roof"></div>
+                <table class="hoq-table w-full text-[11px]">
+                    <thead>
+                        <tr class="bg-slate-100">
+                            <th class="row-header w-48">MASALAH & FITUR &rarr;</th>
+                            <th class="w-12 bg-slate-200">Kano</th>
+                            ${technicalRequirements.map(tr => `
+                                <th class="h-32 p-0 w-12">
+                                    <div class="vertical-text mx-auto font-bold text-slate-600">${tr}</div>
+                                </th>
+                            `).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${validIndices.map(fIdx => `
+                            <tr>
+                                <td class="row-header">
+                                    <div class="text-[9px] text-red-500 font-bold uppercase">Prob: ${features[fIdx].problem}</div>
+                                    <div class="text-blue-700 font-bold text-xs mt-1">Sol: ${features[fIdx].solution}</div>
+                                </td>
+                                <td class="font-black text-center kano-label-${kanoData[fIdx].category}">${kanoData[fIdx].category}</td>
+                                ${technicalRequirements.map((_, tIdx) => {
+                const val = relations[fIdx][tIdx];
+                return `
+                                        <td class="p-0">
+                                            <select onchange="setRelation(${fIdx}, ${tIdx}, this.value)" class="w-full h-full bg-transparent text-center outline-none font-bold">
+                                                <option value="none" ${val === 'none' ? 'selected' : ''}> </option>
+                                                <option value="strong" ${val === 'strong' ? 'selected' : ''}>◎</option>
+                                                <option value="medium" ${val === 'medium' ? 'selected' : ''}>○</option>
+                                                <option value="weak" ${val === 'weak' ? 'selected' : ''}>△</option>
+                                            </select>
+                                        </td>
+                                    `;
+            }).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-slate-50 font-bold">
+                            <td colspan="2" class="text-right px-4 uppercase text-slate-500">Raw Weight (Σ)</td>
+                            ${techWeights.map(w => `<td class="text-blue-800 text-sm">${w}</td>`).join('')}
+                        </tr>
+                        <tr class="bg-white font-bold">
+                            <td colspan="2" class="text-right px-4 uppercase text-slate-400">Prioritas (%)</td>
+                            ${techWeights.map(w => `<td>${((w / maxWeight) * 100).toFixed(0)}%</td>`).join('')}
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+            container.innerHTML = html;
+        }
+
+        // Initialize when window loads
+        window.addEventListener('load', initDB);
+    </script>
+</body>
+
+</html>
