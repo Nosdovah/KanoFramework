@@ -1,6 +1,25 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/:path*" }
+  "builds": [
+    { "src": "api/ping.js",                    "use": "@vercel/node" },
+    { "src": "api/items.js",                   "use": "@vercel/node" },
+    { "src": "api/items/[id].js",              "use": "@vercel/node" },
+    { "src": "api/items/[id]/kano.js",         "use": "@vercel/node" },
+    { "src": "api/items/[id]/relations.js",    "use": "@vercel/node" },
+    { "src": "index.html",                     "use": "@vercel/static" },
+    { "src": "materi.html",                    "use": "@vercel/static" },
+    { "src": "materi.json",                    "use": "@vercel/static" },
+    { "src": "images/**",                      "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/ping",                             "dest": "/api/ping" },
+    { "src": "/api/items/([^/]+)/kano",               "dest": "/api/items/[id]/kano?id=$1" },
+    { "src": "/api/items/([^/]+)/relations",          "dest": "/api/items/[id]/relations?id=$1" },
+    { "src": "/api/items/([^/]+)",                    "dest": "/api/items/[id]?id=$1" },
+    { "src": "/api/items",                            "dest": "/api/items" },
+    { "src": "/materi.json",                          "dest": "/materi.json" },
+    { "src": "/images/(.*)",                          "dest": "/images/$1" },
+    { "src": "/materi.html",                          "dest": "/materi.html" },
+    { "src": "/(.*)",                                 "dest": "/index.html" }
   ]
 }
