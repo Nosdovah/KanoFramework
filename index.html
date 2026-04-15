@@ -88,6 +88,15 @@
         }
 
         /* â–³ = 1 */
+        
+        /* Hide scrollbar utility */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 
@@ -101,18 +110,18 @@
                     <i class="fas fa-microchip text-blue-400 text-xl"></i>
                     <span class="text-lg font-bold tracking-tight">QFD <span class="text-blue-400">System</span></span>
                 </div>
-                <div class="flex space-x-1">
+                <div class="flex space-x-1 overflow-x-auto no-scrollbar whitespace-nowrap ml-4">
                     <button onclick="switchTab('studi-kasus')"
-                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800"
+                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800 flex-shrink-0 text-sm md:text-base"
                         id="btn-studi-kasus">Contoh Studi Kasus</button>
                     <button onclick="switchTab('kano-module')"
-                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800"
+                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800 flex-shrink-0 text-sm md:text-base"
                         id="btn-kano-module">Analisis Kano</button>
                     <button onclick="switchTab('hoq-module')"
-                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800"
+                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800 flex-shrink-0 text-sm md:text-base"
                         id="btn-hoq-module">House of Quality</button>
                     <a href="materi.html"
-                        class="px-4 py-2 rounded-md transition-colors hover:bg-slate-800 text-amber-400 font-semibold flex items-center gap-2">
+                        class="px-4 py-2 rounded-md transition-colors hover:bg-slate-800 text-amber-400 font-semibold flex items-center gap-2 flex-shrink-0 text-sm md:text-base">
                         <i class="fas fa-book-open text-sm"></i>Studi Kasus Kl.5
                     </a>
                 </div>
