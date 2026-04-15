@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -444,7 +444,7 @@
                 renderFeaturePairs();
                 document.getElementById('problem-input').value = "";
                 document.getElementById('solution-input').value = "";
-            } catch (e) { console.error("Failed to add item:", e); alert("Gagal menyimpan."); }
+            } catch (e) { console.error("Failed to add item:", e); alert("Gagal menyimpan: " + e.message); }
         }
 
         window.deleteFeaturePair = async function (index) {
