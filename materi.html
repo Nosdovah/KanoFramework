@@ -161,7 +161,7 @@
 <script>
 async function loadMateri() {
     try {
-        const res = await fetch('./Materi.JSON');
+        const res = await fetch('./materi.json');
         const json = await res.json();
         render(json);
     } catch(e) {
