@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materi VoC | QFD System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); min-height: 100vh; }
+
+        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+
+        .l1-accent { border-left: 4px solid #3b82f6; }
+        .l2-accent { border-left: 4px solid #10b981; }
+        .l3-accent { border-left: 4px solid #a78bfa; }
+        .pain-accent { border-left: 4px solid #f87171; }
+        .metrics-accent { border-left: 4px solid #fbbf24; }
+
+        .badge-high { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
+        .badge-medium { background: rgba(251,191,36,0.15); color: #fcd34d; border: 1px solid rgba(251,191,36,0.3); }
+
+        .need-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .need-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+
+        .tech-req-item { transition: background 0.2s; }
+        .tech-req-item:hover { background: rgba(167,139,250,0.12); }
+
+        .journey-badge {
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 99px;
+            background: rgba(167,139,250,0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(167,139,250,0.3);
+            text-transform: uppercase;
+        }
+
+        .section-connector { display: flex; justify-content: center; margin: 8px 0; }
+        .section-connector .line { width: 2px; height: 28px; background: linear-gradient(to bottom, currentColor, transparent); opacity: 0.4; }
+
+        .voc-card::before {
+            content: '\201C';
+            font-size: 5rem; line-height: 0; vertical-align: -2rem;
+            color: #3b82f6; opacity: 0.35; font-family: serif; margin-right: 4px;
+        }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeUp 0.55s ease forwards; }
+        .d1 { animation-delay: 0.05s; opacity:0; }
+        .d2 { animation-delay: 0.15s; opacity:0; }
+        .d3 { animation-delay: 0.25s; opacity:0; }
+        .d4 { animation-delay: 0.35s; opacity:0; }
+        .d5 { animation-delay: 0.45s; opacity:0; }
+        .d6 { animation-delay: 0.55s; opacity:0; }
+        .d7 { animation-delay: 0.65s; opacity:0; }
+
+        /* Lightbox / Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 999;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 24px;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+        .modal-box {
+            background: #1e293b;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+            max-width: 680px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.92) translateY(20px);
+            transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+        }
+        .modal-overlay.open .modal-box { transform: scale(1) translateY(0); }
+
+        .modal-image-box {
+            max-width: 92vw;
+            max-height: 90vh;
+            background: #0f172a;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.12);
+            transform: scale(0.9);
+            transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+        }
+        .modal-overlay.open .modal-image-box { transform: scale(1); }
+
+        .clickable-card { cursor: pointer; position: relative; }
+        .clickable-card .expand-hint {
+            position: absolute; top: 8px; right: 8px;
+            opacity: 0; transition: opacity 0.2s;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px; padding: 3px 6px;
+            font-size: 10px; color: rgba(255,255,255,0.6);
+        }
+        .clickable-card:hover .expand-hint { opacity: 1; }
+        .clickable-card:hover { cursor: zoom-in; }
+    </style>
+</head>
+<body>
+
+<!-- ─── MODAL OVERLAY ─── -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+    <!-- Card Detail Modal -->
+    <div class="modal-box" id="modal-card" style="display:none">
+        <div class="flex items-start justify-between p-6 border-b border-white/10">
+            <div id="modal-card-header" class="flex items-center gap-3"></div>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-white ml-4 flex-shrink-0 transition-colors">
+                <i class="fas fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <div id="modal-card-body" class="p-6"></div>
+    </div>
+    <!-- Image Modal -->
+    <div class="modal-image-box" id="modal-image" style="display:none">
+        <div class="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <span id="modal-image-label" class="text-white font-bold text-sm"></span>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fas fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <div class="p-4">
+            <img id="modal-image-src" src="" alt="" class="max-h-[80vh] w-auto mx-auto rounded-xl object-contain" />
+        </div>
+    </div>
+</div>
+
+<!-- NAV -->
+<nav class="bg-slate-900/80 backdrop-filter backdrop-blur-md text-white shadow-xl sticky top-0 z-50 border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-microchip text-blue-400 text-xl"></i>
+            <span class="text-lg font-bold">QFD <span class="text-blue-400">System</span></span>
+        </div>
+        <a href="index.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-all">
+            <i class="fas fa-arrow-left"></i> Kembali ke QFD
+        </a>
+    </div>
+</nav>
+
+<main class="max-w-6xl mx-auto px-6 py-12" id="main-content">
+    <div class="flex flex-col items-center justify-center py-32">
+        <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-slate-400 text-sm">Memuat materi...</p>
+    </div>
+</main>
+
+<script>
+async function loadMateri() {
+    try {
+        const res = await fetch('./Materi.JSON');
+        const json = await res.json();
+        render(json);
+    } catch(e) {
+        console.error(e);
+        document.getElementById('main-content').innerHTML = `
+            <div class="text-center py-32 text-red-400">
+                <i class="fas fa-exclamation-triangle text-5xl mb-4 block"></i>
+                <p class="text-xl font-bold">Gagal memuat data.</p>
+                <p class="text-sm mt-2 text-slate-500">Pastikan server berjalan dan Materi.JSON tersedia.</p>
+            </div>`;
+    }
+}
+
+function priorityBadge(p) {
+    const cls = p === 'High' ? 'badge-high' : 'badge-medium';
+    const icon = p === 'High' ? 'fa-arrow-up' : 'fa-minus';
+    return `<span class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${cls}"><i class="fas ${icon} text-[8px]"></i>${p}</span>`;
+}
+
+function sectionTitle(label, color, icon, title, desc) {
+    const colors = { blue: 'bg-blue-600', green: 'bg-emerald-600', violet: 'bg-violet-600', red: 'bg-red-600', amber: 'bg-amber-500' };
+    return `
+        <div class="flex items-center gap-3 mb-5">
+            <div class="${colors[color] || 'bg-slate-600'} text-white text-xs font-black px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+                <i class="fas ${icon} mr-1.5"></i>${label}
+            </div>
+            <div>
+                <h2 class="text-white font-bold text-lg leading-tight">${title}</h2>
+                <p class="text-slate-400 text-xs mt-0.5">${desc}</p>
+            </div>
+        </div>`;
+}
+
+function connector(from, to) {
+    const grad = `from-${from}-500 to-${to}-500`;
+    return `<div class="flex justify-center my-2"><div class="flex flex-col items-center gap-0.5">
+        <div class="w-px h-6 bg-gradient-to-b ${grad} opacity-60"></div>
+        <i class="fas fa-chevron-down text-${to}-400 text-xs opacity-70"></i>
+    </div></div>`;
+}
+
+function render(data) {
+    const d = data.data.voice_of_customer_decomposition;
+    const l1 = d.level_1_primary_needs;
+    const pain = d.pain_points_negative_voc;
+    const l2 = d.level_2_secondary_needs;
+    const l3 = d.level_3_tertiary_needs_technical_requirements;
+    const metrics = d.success_metrics_behavioral_metrics;
+
+    const sections = `
+        <!-- ─── HEADER ─── -->
+        <div class="fade-in d1 text-center mb-12">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30 text-blue-300 text-xs font-semibold uppercase tracking-widest mb-4">
+                <i class="fas fa-users"></i> Voice of Customer Analysis
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-white mb-3">${data['head-title']}</h1>
+            <p class="text-slate-400 text-sm max-w-3xl mx-auto">${data['sub-title']}</p>
+        </div>
+
+        <!-- ─── VoC QUOTE ─── -->
+        <div class="need-card clickable-card glass-card rounded-2xl p-8 mb-4 fade-in d1"
+            data-modal-color="blue" data-modal-icon="fa-quote-left"
+            data-modal-title="Voice of Customer"
+            data-modal-body="${data.voice_of_customer}">
+            <span class="expand-hint"><i class="fas fa-expand-alt"></i></span>
+            <span class="text-xs font-bold text-blue-400 uppercase tracking-widest px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4 block w-fit">
+                <i class="fas fa-quote-left mr-2"></i>Voice of Customer
+            </span>
+            <p class="voc-card text-lg text-slate-200 leading-relaxed italic font-light">${data.voice_of_customer}</p>
+        </div>
+
+        ${connector('blue','blue')}
+
+        <!-- ─── KANO MODEL IMAGE ─── -->
+        <div class="fade-in d2 mb-4">
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="flex items-center gap-3 px-6 py-4 border-b border-white/10">
+                    <div class="bg-blue-600 text-white text-xs font-black px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+                        <i class="fas fa-diagram-project mr-1.5"></i>Referensi
+                    </div>
+                    <div>
+                        <h2 class="text-white font-bold text-lg leading-tight">Kano Model</h2>
+                        <p class="text-slate-400 text-xs mt-0.5">Kerangka analisis untuk mengklasifikasikan fitur dan kebutuhan berdasarkan kepuasan pelanggan.</p>
+                    </div>
+                </div>
+                <div class="p-6 flex justify-center">
+                    <img
+                        src="./images/Kano Model.jpeg"
+                        alt="Kano Model Diagram"
+                        class="rounded-xl max-h-[500px] object-contain w-full shadow-2xl border border-white/10 cursor-zoom-in transition-transform duration-300 hover:scale-[1.02]"
+                        onclick="openImageModal('./images/Kano Model.jpeg', 'Kano Model Diagram')"
+                        onerror="this.closest('.glass-card').innerHTML='<div class=\'p-8 text-center text-slate-500\'><i class=\'fas fa-image text-4xl mb-3 block\'></i><p class=\'text-sm\'>Gambar tidak ditemukan. Pastikan file berada di <code>images/Kano Model.jpeg</code></p></div>'"
+                    />
+                </div>
+            </div>
+        </div>
+
+        ${connector('blue','blue')}
+
+        <!-- ─── L1 PRIMARY NEEDS ─── -->
+        <div class="fade-in d2 mb-4">
+            ${sectionTitle('Level 1', 'blue', 'fa-bullseye', 'Primary Needs (Tujuan Strategis)', l1.tujuan_strategis)}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${l1.needs.map((n,i) => `
+                    <div class="need-card clickable-card glass-card l1-accent rounded-xl p-5"
+                        data-modal-color="blue" data-modal-icon="fa-bullseye"
+                        data-modal-title="${n.kebutuhan}"
+                        data-modal-body="${n.deskripsi}">
+                        <span class="expand-hint"><i class="fas fa-expand-alt"></i></span>
+                        <div class="flex items-start gap-3 mb-2">
+                            <div class="w-7 h-7 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="text-blue-400 text-xs font-bold">${i+1}</span>
+                            </div>
+                            <h3 class="text-blue-300 font-bold text-sm leading-snug">${n.kebutuhan}</h3>
+                        </div>
+                        <p class="text-slate-400 text-xs leading-relaxed pl-10">${n.deskripsi}</p>
+                    </div>`).join('')}
+            </div>
+        </div>
+
+        ${connector('blue','red')}
+
+        <!-- ─── PAIN POINTS ─── -->
+        <div class="fade-in d3 mb-4">
+            ${sectionTitle('Pain Points', 'red', 'fa-triangle-exclamation', 'Negative VoC (Hambatan Pengguna)', pain.konteks)}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                ${pain.points.map((p,i) => `
+                    <div class="need-card clickable-card glass-card pain-accent rounded-xl p-5"
+                        data-modal-color="red" data-modal-icon="fa-triangle-exclamation"
+                        data-modal-title="${p.masalah}"
+                        data-modal-body="${p.deskripsi}">
+                        <span class="expand-hint"><i class="fas fa-expand-alt"></i></span>
+                        <div class="flex items-start gap-3 mb-2">
+                            <div class="w-7 h-7 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-ban text-red-400 text-xs"></i>
+                            </div>
+                            <h3 class="text-red-300 font-bold text-sm leading-snug">${p.masalah}</h3>
+                        </div>
+                        <p class="text-slate-400 text-xs leading-relaxed pl-10">${p.deskripsi}</p>
+                    </div>`).join('')}
+            </div>
+        </div>
+
+        ${connector('red','green')}
+
+        <!-- ─── L2 SECONDARY NEEDS ─── -->
+        <div class="fade-in d4 mb-2">
+            ${sectionTitle('Level 2', 'green', 'fa-list-check', 'Secondary Needs (Kriteria Keberhasilan)', l2.kriteria_keberhasilan)}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                ${l2.needs_table.map((n,i) => `
+                    <div class="need-card clickable-card glass-card l2-accent rounded-xl p-5"
+                        data-modal-color="green" data-modal-icon="fa-list-check"
+                        data-modal-title="${n.kebutuhan_sekunder}"
+                        data-modal-priority="${n.prioritas}"
+                        data-modal-body="${n.deskripsi}">
+                        <span class="expand-hint"><i class="fas fa-expand-alt"></i></span>
+                        <div class="flex items-start justify-between gap-2 mb-2">
+                            <div class="flex items-start gap-3">
+                                <div class="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-emerald-400 text-xs font-bold">${i+1}</span>
+                                </div>
+                                <h3 class="text-emerald-300 font-bold text-sm leading-snug">${n.kebutuhan_sekunder}</h3>
+                            </div>
+                            <div class="flex-shrink-0 mt-0.5">${priorityBadge(n.prioritas)}</div>
+                        </div>
+                        <p class="text-slate-400 text-xs leading-relaxed pl-10">${n.deskripsi}</p>
+                    </div>`).join('')}
+            </div>
+
+            <!-- Trade-off awareness -->
+            <div class="glass-card rounded-xl p-5 border border-amber-500/20">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-scale-balanced text-amber-400"></i>
+                    <h4 class="text-amber-300 font-bold text-sm">Awareness: Trade-offs yang Harus Dikelola</h4>
+                    <span class="text-slate-500 text-xs ml-1">— ${l2.awareness_trade_off.konteks}</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    ${l2.awareness_trade_off.items.map(t => `
+                        <div class="need-card clickable-card rounded-lg bg-amber-500/5 border border-amber-500/20 p-4"
+                            data-modal-color="amber" data-modal-icon="fa-scale-balanced"
+                            data-modal-title="${t.trade_off}"
+                            data-modal-body="${t.deskripsi}">
+                            <span class="expand-hint"><i class="fas fa-expand-alt"></i></span>
+                            <p class="text-amber-300 font-bold text-xs mb-1.5">${t.trade_off}</p>
+                            <p class="text-slate-400 text-xs leading-relaxed">${t.deskripsi}</p>
+                        </div>`).join('')}
+                </div>
+            </div>
+        </div>
+
+        ${connector('green','violet')}
+
+        <!-- ─── L3 TERTIARY / TECHNICAL REQUIREMENTS ─── -->
+        <div class="fade-in d5 mb-4">
+            ${sectionTitle('Level 3', 'violet', 'fa-gears', 'Tertiary Needs / Technical Requirements (Solusi Spesifik)', l3.detail_sistem)}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                ${l3.requirements_table.map(req => `
+                    <div class="need-card clickable-card glass-card rounded-xl overflow-hidden"
+                        data-modal-color="violet" data-modal-icon="fa-gears"
+                        data-modal-title="${req.secondary_need}"
+                        data-modal-journey="${req.fase_journey}"
+                        data-modal-reqs="${encodeURIComponent(JSON.stringify(req.technical_requirement))}"
+                        data-modal-extra="${req.personalization_layer}">
+                        <span class="expand-hint" style="z-index:2"><i class="fas fa-expand-alt"></i></span>
+                        <div class="bg-gradient-to-r from-violet-700 to-violet-600 px-5 py-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-layer-group text-white/70 text-sm"></i>
+                                <span class="text-white font-bold text-sm">${req.secondary_need}</span>
+                            </div>
+                            <span class="journey-badge">${req.fase_journey}</span>
+                        </div>
+                        <div class="p-5 space-y-2">
+                            ${req.technical_requirement.map((r,ri) => `
+                                <div class="tech-req-item flex items-start gap-3 p-3 rounded-lg border border-white/5">
+                                    <div class="w-5 h-5 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span class="text-violet-400 text-[9px] font-bold">${ri+1}</span>
+                                    </div>
+                                    <p class="text-slate-300 text-xs leading-relaxed">${r}</p>
+                                </div>`).join('')}
+                            <div class="mt-3 flex items-start gap-2 bg-violet-500/10 border border-violet-500/20 rounded-lg px-4 py-3">
+                                <i class="fas fa-wand-magic-sparkles text-violet-300 text-xs mt-0.5 flex-shrink-0"></i>
+                                <p class="text-violet-200 text-xs leading-relaxed font-medium">${req.personalization_layer}</p>
+                            </div>
+                        </div>
+                    </div>`).join('')}
+            </div>
+        </div>
+
+        ${connector('violet','amber')}
+
+        <!-- ─── SUCCESS METRICS ─── -->
+        <div class="fade-in d6 mb-12">
+            ${sectionTitle('Metrics', 'amber', 'fa-chart-line', 'Success & Behavioral Metrics', metrics.konteks)}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                ${metrics.metrics.map((m,i) => `
+                    <div class="need-card clickable-card glass-card metrics-accent rounded-xl p-5 text-center"
+                        data-modal-color="amber" data-modal-icon="fa-chart-line"
+                        data-modal-title="${m.metrik}"
+                        data-modal-emoji="${['📊','💬','⚡','🔄'][i] || '📌'}"
+                        data-modal-body="${m.deskripsi}">
+                        <span class="expand-hint"><i class="fas fa-expand-alt"></i></span>
+                        <div class="text-2xl font-black text-amber-400 mb-2">${['📊','💬','⚡','🔄'][i] || '📌'}</div>
+                        <h3 class="text-amber-300 font-bold text-sm mb-2">${m.metrik}</h3>
+                        <p class="text-slate-400 text-xs leading-relaxed">${m.deskripsi}</p>
+                    </div>`).join('')}
+            </div>
+        </div>
+
+        <!-- ─── CTA ─── -->
+        <div class="fade-in d7 text-center mb-8">
+            <div class="glass-card inline-flex flex-wrap items-center justify-center gap-4 px-8 py-5 rounded-2xl">
+                <i class="fas fa-lightbulb text-amber-400 text-2xl"></i>
+                <div class="text-left">
+                    <p class="text-white font-bold text-sm">Siap menganalisis lebih lanjut?</p>
+                    <p class="text-slate-400 text-xs">Gunakan Analisis Kano & HoQ untuk memetakan kebutuhan ini ke spesifikasi teknis.</p>
+                </div>
+                <a href="index.html" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all shadow-lg whitespace-nowrap">
+                    Buka QFD Tool <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('main-content').innerHTML = sections;
+
+    // Delegated click listener — reads data-* attributes safely, no inline JS string issues
+    document.getElementById('main-content').addEventListener('click', function(e) {
+        const card = e.target.closest('[data-modal-title]');
+        if (!card) return;
+
+        const color    = card.dataset.modalColor   || 'blue';
+        const icon     = card.dataset.modalIcon    || 'fa-info-circle';
+        const title    = card.dataset.modalTitle   || '';
+        const body     = card.dataset.modalBody    || '';
+        const priority = card.dataset.modalPriority || '';
+        const emoji    = card.dataset.modalEmoji   || '';
+        const journey  = card.dataset.modalJourney || '';
+        const reqs     = card.dataset.modalReqs    || '';
+        const extra    = card.dataset.modalExtra   || '';
+
+        let bodyHTML = '';
+
+        // L3 Technical Requirements card
+        if (reqs) {
+            try {
+                const reqList = JSON.parse(decodeURIComponent(reqs));
+                if (journey) {
+                    bodyHTML += `<div class="journey-badge inline-block mb-4">${journey}</div>`;
+                }
+                bodyHTML += `<div class="space-y-2 mb-4">`;
+                reqList.forEach((r, ri) => {
+                    bodyHTML += `
+                        <div class="flex items-start gap-3 p-3 rounded-lg border border-white/10 bg-violet-500/5">
+                            <div class="w-5 h-5 rounded-full bg-violet-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span class="text-violet-400 text-[9px] font-bold">${ri+1}</span>
+                            </div>
+                            <p class="text-slate-300 text-xs leading-relaxed">${r}</p>
+                        </div>`;
+                });
+                bodyHTML += `</div>`;
+                if (extra) {
+                    bodyHTML += `
+                        <div class="flex items-start gap-2 bg-violet-500/10 border border-violet-500/30 rounded-lg px-4 py-3">
+                            <i class="fas fa-wand-magic-sparkles text-violet-300 text-xs mt-0.5 flex-shrink-0"></i>
+                            <p class="text-violet-200 text-sm leading-relaxed font-medium">${extra}</p>
+                        </div>`;
+                }
+            } catch(e) {
+                bodyHTML = `<p class="text-slate-300 text-sm">${body}</p>`;
+            }
+        } else {
+            // Standard card
+            if (emoji)    bodyHTML += `<div class="text-5xl mb-4 text-center">${emoji}</div>`;
+            if (priority) bodyHTML += `<div class="mb-3">${priorityBadge(priority)}</div>`;
+            bodyHTML += `<p class="text-slate-300 leading-relaxed text-sm">${body}</p>`;
+        }
+
+        openCardModal(color, icon, title, bodyHTML);
+    });
+}
+
+window.addEventListener('load', loadMateri);
+
+// ─── MODAL FUNCTIONS ───
+function openImageModal(src, label) {
+    document.getElementById('modal-card').style.display = 'none';
+    document.getElementById('modal-image').style.display = 'block';
+    document.getElementById('modal-image-src').src = src;
+    document.getElementById('modal-image-label').textContent = label || 'Image';
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function openCardModal(accentColor, icon, title, bodyHTML) {
+    const colors = { blue:'bg-blue-600', green:'bg-emerald-600', violet:'bg-violet-600', red:'bg-red-600', amber:'bg-amber-500' };
+    document.getElementById('modal-card').style.display = 'block';
+    document.getElementById('modal-image').style.display = 'none';
+    document.getElementById('modal-card-header').innerHTML = `
+        <div class="${colors[accentColor] || 'bg-slate-600'} text-white text-xs font-black px-3 py-1.5 rounded-lg">
+            <i class="fas ${icon} mr-1.5"></i>${title.split(' ')[0]}
+        </div>
+        <h3 class="text-white font-bold text-base leading-snug">${title}</h3>
+    `;
+    document.getElementById('modal-card-body').innerHTML = bodyHTML;
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+    if (e && e.target !== document.getElementById('modal')) return;
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+        document.getElementById('modal-card').style.display = 'none';
+        document.getElementById('modal-image').style.display = 'none';
+    }, 280);
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal({}); });
+</script>
+</body>
+</html>

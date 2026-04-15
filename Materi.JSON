@@ -1,0 +1,170 @@
+{
+  "head-title": "Online Community Member (Professional Network)",
+  "voice_of_customer": "Saya join komunitas profesional online. Saya ingin networking dan belajar. Tapi tidak semua member aktif. Banyak yang hanya “silent reader”. Admin sering membuat event atau diskusi, tapi engagement naik turun. Saya ingin value dari komunitas, tapi juga tidak punya banyak waktu untuk aktif. Kadang saya merasa komunitas ini valuable, tapi tidak cukup untuk jadi prioritas saya.",
+  "sub-title": "Dekomposisi Voice of Customer (VoC) dari anggota komunitas profesional online tersebut ke dalam struktur Hierarchy yang detail:",
+  "data": {
+    "voice_of_customer_decomposition": {
+      "level_1_primary_needs": {
+        "tujuan_strategis": "Kebutuhan dasar yang mendorong pengguna untuk bergabung dan bertahan dalam komunitas profesional.",
+        "needs": [
+          {
+            "kebutuhan": "Pengembangan Karier & Kompetensi",
+            "deskripsi": "Pengguna ingin mendapatkan manfaat nyata bagi pertumbuhan profesionalnya melalui interaksi dan pengetahuan."
+          },
+          {
+            "kebutuhan": "Efisiensi Waktu & Prioritas",
+            "deskripsi": "Pengguna membutuhkan sistem yang memungkinkan mereka mendapatkan nilai maksimal tanpa harus mengorbankan banyak waktu."
+          },
+          {
+            "kebutuhan": "Kualitas Ekosistem Komunitas",
+            "deskripsi": "Pengguna menginginkan lingkungan yang hidup, interaktif, dan memiliki tingkat keterlibatan yang stabil."
+          },
+          {
+            "kebutuhan": "Sense of Belonging",
+            "deskripsi": "Membangun rasa memiliki agar anggota merasa menjadi bagian penting dari identitas kelompok tersebut."
+          },
+          {
+            "kebutuhan": "Psychological Safety",
+            "deskripsi": "Menciptakan ruang di mana anggota merasa nyaman untuk berpendapat atau bertanya tanpa takut dihakimi."
+          },
+          {
+            "kebutuhan": "Motivation to Participate",
+            "deskripsi": "Adanya dorongan intrinsik maupun ekstrinsik yang kuat bagi anggota untuk berhenti menjadi silent reader dan mulai aktif berkontribusi."
+          }
+        ]
+      },
+      "pain_points_negative_voc": {
+        "konteks": "Sebelum melangkah ke solusi, kita harus memahami hambatan mental dan operasional yang dihadapi pengguna:",
+        "points": [
+          {
+            "masalah": "Information Overload",
+            "deskripsi": "Terlalu banyak pesan atau notifikasi yang tidak relevan sehingga mengganggu fokus."
+          },
+          {
+            "masalah": "Fear of Ghosting",
+            "deskripsi": "Ketakutan bahwa pertanyaan atau pendapat yang dilempar tidak akan mendapat respon (mengurangi psychological safety)."
+          },
+          {
+            "masalah": "Role Ambiguity",
+            "deskripsi": "Anggota tidak merasa \"dibutuhkan\" atau tidak tahu nilai unik apa yang bisa mereka berikan ke komunitas."
+          },
+          {
+            "masalah": "Entry Barrier",
+            "deskripsi": "Tidak tahu harus mulai dari mana saat pertama kali bergabung."
+          }
+        ]
+      },
+      "level_2_secondary_needs": {
+        "kriteria_keberhasilan": "Penjabaran spesifik mengenai apa yang harus dipenuhi oleh pengelola komunitas beserta bobot prioritasnya.",
+        "needs_table": [
+          {
+            "kebutuhan_sekunder": "Akses Networking Berkualitas",
+            "deskripsi": "Membutuhkan jembatan untuk terhubung dengan profesional lain demi peluang karier atau kolaborasi.",
+            "prioritas": "High"
+          },
+          {
+            "kebutuhan_sekunder": "Akses Pembelajaran Relevan",
+            "deskripsi": "Membutuhkan konten atau diskusi yang memberikan wawasan baru dan praktis.",
+            "prioritas": "High"
+          },
+          {
+            "kebutuhan_sekunder": "Optimalisasi Konten Asinkron",
+            "deskripsi": "Karena keterbatasan waktu, pengguna membutuhkan cara mendapatkan nilai tanpa harus hadir secara real-time.",
+            "prioritas": "High"
+          },
+          {
+            "kebutuhan_sekunder": "Interaksi Timbal Balik (Reciprocity)",
+            "deskripsi": "Jaminan bahwa kontribusi atau pertanyaan akan ditanggapi oleh anggota lain.",
+            "prioritas": "Medium"
+          },
+          {
+            "kebutuhan_sekunder": "Justifikasi Nilai (Value Prop)",
+            "deskripsi": "Komunitas harus membuktikan manfaatnya cukup kuat untuk menggeser prioritas harian pengguna.",
+            "prioritas": "High"
+          }
+        ],
+        "awareness_trade_off": {
+          "konteks": "Setiap solusi memiliki konsekuensi yang harus dikelola:",
+          "items": [
+            {
+              "trade_off": "Notifikasi vs Gangguan",
+              "deskripsi": "Terlalu banyak notifikasi untuk memicu engagement justru berisiko membuat pengguna melakukan mute pada komunitas."
+            },
+            {
+              "trade_off": "Gamification vs Spam",
+              "deskripsi": "Sistem poin atau reward bisa memicu banyak komentar berkualitas rendah hanya demi mengejar peringkat."
+            },
+            {
+              "trade_off": "Eksklusivitas vs Inklusivitas",
+              "deskripsi": "Memperketat filter anggota meningkatkan kualitas networking namun dapat mengurangi keberagaman ide dan inklusivitas."
+            }
+          ]
+        }
+      },
+      "level_3_tertiary_needs_technical_requirements": {
+        "detail_sistem": "Detail fitur, fase perjalanan pengguna, dan metrik keberhasilan.",
+        "requirements_table": [
+          {
+            "fase_journey": "Join & Explore",
+            "secondary_need": "Networking & Learning",
+            "technical_requirement": [
+              "Sistem verifikasi profil untuk kredibilitas anggota.",
+              "Direktori anggota berdasarkan keahlian."
+            ],
+            "personalization_layer": "Personalized Networking Suggestion: Rekomendasi koneksi berdasarkan minat/keahlian."
+          },
+          {
+            "fase_journey": "Explore & Engage",
+            "secondary_need": "Engagement Efficiency",
+            "technical_requirement": [
+              "Weekly Digest atau ringkasan diskusi via email.",
+              "Penandaan (tagging) topik spesifik.",
+              "Format acara singkat (15 menit)."
+            ],
+            "personalization_layer": "Personalized Feed: Menampilkan diskusi yang paling relevan dengan profil pengguna."
+          },
+          {
+            "fase_journey": "Engage",
+            "secondary_need": "Community Dynamics",
+            "technical_requirement": [
+              "Strategi aktivasi silent readers (polling/check-in).",
+              "Moderator proaktif pada jam tertentu.",
+              "Feedback Loop System: Sistem rating cepat untuk setiap event/diskusi."
+            ],
+            "personalization_layer": "Personalized Notification: Notifikasi hanya untuk topik yang diikuti atau mention langsung."
+          },
+          {
+            "fase_journey": "Retain",
+            "secondary_need": "Value & Priority",
+            "technical_requirement": [
+              "Integrasi jadwal event ke kalender pribadi secara otomatis.",
+              "Feedback Loop System: Analitik AI untuk membaca pola engagement anggota."
+            ],
+            "personalization_layer": "Iterasi Konten: Penyesuaian materi diskusi berdasarkan data preferensi historis pengguna."
+          }
+        ]
+      },
+      "success_metrics_behavioral_metrics": {
+        "konteks": "Untuk mengukur inovasi ini secara efektif, kita melihat melampaui angka output dasar:",
+        "metrics": [
+          {
+            "metrik": "Engagement Rate",
+            "deskripsi": "Persentase anggota aktif dibandingkan silent readers secara berkala."
+          },
+          {
+            "metrik": "Response Rate",
+            "deskripsi": "Persentase kiriman (post) yang mendapatkan setidaknya satu jawaban berkualitas."
+          },
+          {
+            "metrik": "Avg. Time to First Reply",
+            "deskripsi": "Kecepatan komunitas dalam memberikan respon terhadap anggota."
+          },
+          {
+            "metrik": "Retention Rate Member Aktif",
+            "deskripsi": "Persentase anggota aktif yang tetap terlibat setelah periode 3-6 bulan."
+          }
+        ]
+      }
+    }
+  }
+}
