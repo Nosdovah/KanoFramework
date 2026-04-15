@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -75,19 +75,19 @@
             font-weight: 900;
         }
 
-        /* ◎ = 9 */
+        /* â—Ž = 9 */
         .relation-medium {
             color: #10b981;
             font-weight: 900;
         }
 
-        /* ○ = 3 */
+        /* â—‹ = 3 */
         .relation-weak {
             color: #f59e0b;
             font-weight: 900;
         }
 
-        /* △ = 1 */
+        /* â–³ = 1 */
     </style>
 </head>
 
@@ -135,8 +135,8 @@
                         <h3 class="text-xl font-bold text-slate-900 border-b pb-2 mb-4">Babak 1: Era Keemasan dan
                             Ekspansi Ambisius</h3>
                         <p>
-                            Lima tahun lalu, Pak Baskoro—seorang mantan direktur bank yang memilih pensiun
-                            dini—mendirikan <strong>Nusantara Roastery</strong>. Awalnya, bisnis ini adalah fasilitas
+                            Lima tahun lalu, Pak Baskoroâ€”seorang mantan direktur bank yang memilih pensiun
+                            diniâ€”mendirikan <strong>Nusantara Roastery</strong>. Awalnya, bisnis ini adalah fasilitas
                             penyangraian kopi (roastery) B2B yang menyuplai biji kopi berkualitas ke puluhan kedai kopi
                             independen di ibu kota. Karena dedikasi Pak Baskoro pada profil sangrai yang presisi dan
                             hubungannya yang etis dengan petani lokal, bisnis ini meledak.
@@ -353,7 +353,7 @@
             <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-4 rounded-lg border text-[11px]">
                     <h4 class="font-bold mb-2">Simbol Hubungan:</h4>
-                    <p>◎ Strong (9) | ○ Medium (3) | △ Weak (1)</p>
+                    <p>â—Ž Strong (9) | â—‹ Medium (3) | â–³ Weak (1)</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg border text-[11px]">
                     <h4 class="font-bold mb-2">Prioritas Kano:</h4>
@@ -361,104 +361,57 @@
                 </div>
                 <div class="bg-white p-4 rounded-lg border text-[11px]">
                     <h4 class="font-bold mb-2">Technical Target:</h4>
-                    <p>Raw Weight = Σ (Relationship × Kano Importance)</p>
+                    <p>Raw Weight = Î£ (Relationship Ã— Kano Importance)</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <script type="module">
-        import { createClient } from "https://esm.sh/@libsql/client/web";
+    <script>
+        const API_URL = "/api";
 
-        // ==========================================
-        // 🚨 TURSO CONFIGURATION: PASTE CREDENTIALS HERE
-        // ==========================================
-        const TURSO_URL = "libsql://kanoframework-nosdovah.aws-ap-northeast-1.turso.io";
-        const TURSO_AUTH_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NzYyMTg3MzksImlkIjoiMDE5ZDhlZTItZmMwMS03NzQ4LTgwMTItOWFiYTg1YzAwYjA0IiwicmlkIjoiYTYxNzA3MjAtNDk2YS00YmFmLTkwMTctMDIwODVjMzM1MGM2In0.iOu8AqS-KlhZ83rohU70tb55csasVVZ1hg_1Ywhm5muOEbLszL9wDKdqpM6I7E5yWM1x_RCT938RYzCYYtfODg";
-
-        let client = null;
-        try {
-            if (TURSO_URL && !TURSO_URL.includes("YOUR_TURSO_DATABASE_URL")) {
-                client = createClient({
-                    url: TURSO_URL,
-                    authToken: TURSO_AUTH_TOKEN
-                });
-            }
-        } catch (e) {
-            console.error("Failed to initialize Turso Client", e);
-        }
-
-        // State Database
-        let features = []; // Menyimpan objek { dbId, problem, solution }
-        let kanoData = []; // { f:'', d:'', category:'' }
+        let features = [];
+        let kanoData = [];
         let relations = [];
 
         const relScores = { 'none': 0, 'strong': 9, 'medium': 3, 'weak': 1 };
         const technicalRequirements = [
-            "Network Bandwidth",
-            "Hardware Durability",
-            "Server Response Time",
-            "Staff Training Hours",
-            "Maintenance Cost",
-            "User Interface Simplicity",
-            "Energy Efficiency"
+            "Network Bandwidth", "Hardware Durability", "Server Response Time",
+            "Staff Training Hours", "Maintenance Cost", "User Interface Simplicity", "Energy Efficiency"
         ];
 
         const kanoMatrix = {
-            "Suka": { "Suka": "Q", "Harus Ada": "A", "Netral": "A", "Dapat Ditoleransi": "A", "Tidak Suka": "O" },
-            "Harus Ada": { "Suka": "R", "Harus Ada": "I", "Netral": "I", "Dapat Ditoleransi": "I", "Tidak Suka": "M" },
-            "Netral": { "Suka": "R", "Harus Ada": "I", "Netral": "I", "Dapat Ditoleransi": "I", "Tidak Suka": "M" },
-            "Dapat Ditoleransi": { "Suka": "R", "Harus Ada": "I", "Netral": "I", "Dapat Ditoleransi": "I", "Tidak Suka": "M" },
-            "Tidak Suka": { "Suka": "R", "Harus Ada": "R", "Netral": "R", "Dapat Ditoleransi": "R", "Tidak Suka": "Q" }
+            "Suka":             { "Suka": "Q", "Harus Ada": "A", "Netral": "A", "Dapat Ditoleransi": "A", "Tidak Suka": "O" },
+            "Harus Ada":        { "Suka": "R", "Harus Ada": "I", "Netral": "I", "Dapat Ditoleransi": "I", "Tidak Suka": "M" },
+            "Netral":           { "Suka": "R", "Harus Ada": "I", "Netral": "I", "Dapat Ditoleransi": "I", "Tidak Suka": "M" },
+            "Dapat Ditoleransi":{ "Suka": "R", "Harus Ada": "I", "Netral": "I", "Dapat Ditoleransi": "I", "Tidak Suka": "M" },
+            "Tidak Suka":       { "Suka": "R", "Harus Ada": "R", "Netral": "R", "Dapat Ditoleransi": "R", "Tidak Suka": "Q" }
         };
 
-        async function initDB() {
-            if (!client) {
-                console.warn("Turso Offline: Running locally in-memory.");
-                return;
-            }
+        async function initApp() {
             try {
-                await client.execute(`
-                    CREATE TABLE IF NOT EXISTS kano_items (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        problem TEXT,
-                        solution TEXT,
-                        kano_f TEXT,
-                        kano_d TEXT,
-                        kano_category TEXT,
-                        relations TEXT
-                    )
-                `);
                 await loadData();
             } catch (e) {
-                console.error("Error init DB:", e);
-                alert("Database Error: Periksa konsol untuk detailnya.");
+                console.error("Error initializing app:", e);
+                alert("Gagal terhubung ke backend. Pastikan server berjalan.");
             }
         }
 
         async function loadData() {
-            if (!client) return;
             try {
-                const res = await client.execute("SELECT * FROM kano_items ORDER BY id ASC");
-                features = [];
-                kanoData = [];
-                relations = [];
-                res.rows.forEach(r => {
+                const res = await fetch(`${API_URL}/items`);
+                const rows = await res.json();
+                features = []; kanoData = []; relations = [];
+                rows.forEach(r => {
                     features.push({ dbId: r.id, problem: r.problem, solution: r.solution });
                     kanoData.push({ f: r.kano_f || '', d: r.kano_d || '', category: r.kano_category || '' });
                     try {
                         const rel = JSON.parse(r.relations);
                         relations.push(rel.length === technicalRequirements.length ? rel : Array(technicalRequirements.length).fill('none'));
-                    } catch (e) {
-                        relations.push(Array(technicalRequirements.length).fill('none'));
-                    }
+                    } catch { relations.push(Array(technicalRequirements.length).fill('none')); }
                 });
-                renderFeaturePairs();
-                renderKanoTesting();
-                renderHoQ();
-            } catch (e) {
-                console.error("Error loading data:", e);
-            }
+                renderFeaturePairs(); renderKanoTesting(); renderHoQ();
+            } catch (e) { console.error("Error loading data:", e); }
         }
 
         window.switchTab = function (tabId) {
@@ -470,63 +423,37 @@
         window.goToKanoStep = function (n) {
             document.querySelectorAll('.kano-step').forEach(s => s.classList.remove('active'));
             document.getElementById(`kano-step-${n}`).classList.add('active');
-            if (n === 2) {
-                renderKanoTesting();
-                setTimeout(window.drawKanoGraph, 100);
-            }
+            if (n === 2) { renderKanoTesting(); setTimeout(window.drawKanoGraph, 100); }
         }
 
         window.addFeaturePair = async function () {
             const prob = document.getElementById('problem-input').value.trim();
-            const sol = document.getElementById('solution-input').value.trim();
+            const sol  = document.getElementById('solution-input').value.trim();
             if (!prob || !sol) return;
-
             const initialRelations = Array(technicalRequirements.length).fill('none');
-            let dbId = null;
-
-            if (client) {
-                try {
-                    const res = await client.execute({
-                        sql: "INSERT INTO kano_items (problem, solution, kano_f, kano_d, kano_category, relations) VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
-                        args: [prob, sol, "", "", "", JSON.stringify(initialRelations)]
-                    });
-                    dbId = res.rows[0].id;
-                } catch (e) {
-                    console.error("Failed to insert via Turso", e);
-                    alert("Gagal menyimpan ke database.");
-                    return;
-                }
-            } else {
-                dbId = Date.now(); // fallback dummy ID for local offline test
-            }
-
-            features.push({ dbId, problem: prob, solution: sol });
-            kanoData.push({ f: '', d: '', category: '' });
-            relations.push(initialRelations);
-
-            renderFeaturePairs();
-            document.getElementById('problem-input').value = "";
-            document.getElementById('solution-input').value = "";
+            try {
+                const res = await fetch(`${API_URL}/items`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ problem: prob, solution: sol, relations: JSON.stringify(initialRelations) })
+                });
+                const data = await res.json();
+                features.push({ dbId: data.id, problem: prob, solution: sol });
+                kanoData.push({ f: '', d: '', category: '' });
+                relations.push(initialRelations);
+                renderFeaturePairs();
+                document.getElementById('problem-input').value = "";
+                document.getElementById('solution-input').value = "";
+            } catch (e) { console.error("Failed to add item:", e); alert("Gagal menyimpan."); }
         }
 
         window.deleteFeaturePair = async function (index) {
             const dbId = features[index].dbId;
-            if (client) {
-                try {
-                    await client.execute({ sql: "DELETE FROM kano_items WHERE id = ?", args: [dbId] });
-                } catch (e) {
-                    console.error("Failed to delete", e);
-                    alert("Gagal menghapus data.");
-                    return;
-                }
-            }
-
-            features.splice(index, 1);
-            kanoData.splice(index, 1);
-            relations.splice(index, 1);
-            renderFeaturePairs();
-            renderKanoTesting();
-            renderHoQ();
+            try {
+                await fetch(`${API_URL}/items/${dbId}`, { method: 'DELETE' });
+                features.splice(index, 1); kanoData.splice(index, 1); relations.splice(index, 1);
+                renderFeaturePairs(); renderKanoTesting(); renderHoQ();
+            } catch (e) { console.error("Failed to delete:", e); alert("Gagal menghapus."); }
         }
 
         function renderFeaturePairs() {
@@ -552,7 +479,6 @@
         function renderKanoTesting() {
             const list = document.getElementById('kano-testing-list');
             const opts = ["Suka", "Harus Ada", "Netral", "Dapat Ditoleransi", "Tidak Suka"];
-
             list.innerHTML = features.map((f, i) => `
                 <div class="p-4 bg-slate-50 border rounded-lg">
                     <div class="flex justify-between items-start mb-2">
@@ -574,7 +500,6 @@
                     </div>
                 </div>
             `).join('');
-
             features.forEach((_, i) => updateBadgeColor(i, kanoData[i].category));
         }
 
@@ -592,25 +517,19 @@
         window.updateKano = async function (idx, type, val) {
             kanoData[idx][type] = val;
             let cat = kanoData[idx].category || "";
-
             if (kanoData[idx].f && kanoData[idx].d) {
                 cat = kanoMatrix[kanoData[idx].f]?.[kanoData[idx].d] || "";
                 kanoData[idx].category = cat;
                 updateBadgeColor(idx, cat);
                 window.drawKanoGraph();
             }
-
-            if (client) {
-                const dbId = features[idx].dbId;
-                try {
-                    await client.execute({
-                        sql: "UPDATE kano_items SET kano_f = ?, kano_d = ?, kano_category = ? WHERE id = ?",
-                        args: [kanoData[idx].f, kanoData[idx].d, cat, dbId]
-                    });
-                } catch (e) {
-                    console.error("Failed to update kano info", e);
-                }
-            }
+            try {
+                await fetch(`${API_URL}/items/${features[idx].dbId}/kano`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ f: kanoData[idx].f, d: kanoData[idx].d, category: cat })
+                });
+            } catch (e) { console.error("Failed to update kano:", e); }
         }
 
         window.drawKanoGraph = function () {
@@ -618,27 +537,22 @@
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, 400, 400);
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.setLineDash([5, 5]);
+            ctx.strokeStyle = '#e2e8f0'; ctx.setLineDash([5, 5]);
             ctx.beginPath(); ctx.moveTo(200, 20); ctx.lineTo(200, 380); ctx.stroke();
             ctx.beginPath(); ctx.moveTo(20, 200); ctx.lineTo(380, 200); ctx.stroke();
             ctx.setLineDash([]);
-
             kanoData.forEach((d, i) => {
                 if (!d.category) return;
                 let x = 200, y = 200;
                 if (d.category === 'A') { x = 120; y = 120; }
                 if (d.category === 'O') { x = 280; y = 120; }
                 if (d.category === 'M') { x = 280; y = 280; }
-
                 const scatter = (i * 15) % 40 - 20;
                 x += scatter; y += scatter;
-
                 ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2);
-                ctx.fillStyle = (d.category === 'M') ? '#dc2626' : (d.category === 'O') ? '#2563eb' : (d.category === 'A') ? '#10b981' : '#94a3b8';
+                ctx.fillStyle = d.category === 'M' ? '#dc2626' : d.category === 'O' ? '#2563eb' : d.category === 'A' ? '#10b981' : '#94a3b8';
                 ctx.fill();
-                ctx.fillStyle = '#1e293b';
-                ctx.font = 'bold 10px Inter';
+                ctx.fillStyle = '#1e293b'; ctx.font = 'bold 10px Inter';
                 ctx.fillText(features[i].solution.substring(0, 10), x + 10, y + 4);
             });
         }
@@ -646,50 +560,37 @@
         window.setRelation = async function (fIdx, tIdx, scoreKey) {
             relations[fIdx][tIdx] = scoreKey;
             renderHoQ();
-
-            if (client) {
-                const dbId = features[fIdx].dbId;
-                try {
-                    await client.execute({
-                        sql: "UPDATE kano_items SET relations = ? WHERE id = ?",
-                        args: [JSON.stringify(relations[fIdx]), dbId]
-                    });
-                } catch (e) {
-                    console.error("Failed to update relations", e);
-                }
-            }
+            try {
+                await fetch(`${API_URL}/items/${features[fIdx].dbId}/relations`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ relations: JSON.stringify(relations[fIdx]) })
+                });
+            } catch (e) { console.error("Failed to update relations:", e); }
         }
 
         function renderHoQ() {
             const container = document.getElementById('hoq-matrix-root');
             const validIndices = features.map((_, i) => i).filter(i => kanoData[i]?.category && !['I', 'R', 'Q'].includes(kanoData[i].category));
-
             if (validIndices.length === 0) {
                 container.innerHTML = `<div class="p-20 text-center text-slate-400 italic">Selesaikan evaluasi Kano untuk fitur prioritas (M, O, atau A)...</div>`;
                 return;
             }
-
-            const techWeights = technicalRequirements.map((_, tIdx) => {
-                return validIndices.reduce((sum, fIdx) => {
-                    const imp = (kanoData[fIdx].category === 'M') ? 5 : (kanoData[fIdx].category === 'O' ? 3 : 1);
+            const techWeights = technicalRequirements.map((_, tIdx) =>
+                validIndices.reduce((sum, fIdx) => {
+                    const imp = kanoData[fIdx].category === 'M' ? 5 : kanoData[fIdx].category === 'O' ? 3 : 1;
                     return sum + (imp * relScores[relations[fIdx][tIdx]]);
-                }, 0);
-            });
-
+                }, 0)
+            );
             const maxWeight = Math.max(...techWeights, 1);
-
-            let html = `
+            container.innerHTML = `
                 <div class="hoq-roof"></div>
                 <table class="hoq-table w-full text-[11px]">
                     <thead>
                         <tr class="bg-slate-100">
-                            <th class="row-header w-48">MASALAH & FITUR &rarr;</th>
+                            <th class="row-header w-48">MASALAH &amp; FITUR &rarr;</th>
                             <th class="w-12 bg-slate-200">Kano</th>
-                            ${technicalRequirements.map(tr => `
-                                <th class="h-32 p-0 w-12">
-                                    <div class="vertical-text mx-auto font-bold text-slate-600">${tr}</div>
-                                </th>
-                            `).join('')}
+                            ${technicalRequirements.map(tr => `<th class="h-32 p-0 w-12"><div class="vertical-text mx-auto font-bold text-slate-600">${tr}</div></th>`).join('')}
                         </tr>
                     </thead>
                     <tbody>
@@ -701,38 +602,30 @@
                                 </td>
                                 <td class="font-black text-center kano-label-${kanoData[fIdx].category}">${kanoData[fIdx].category}</td>
                                 ${technicalRequirements.map((_, tIdx) => {
-                const val = relations[fIdx][tIdx];
-                return `
-                                        <td class="p-0">
-                                            <select onchange="setRelation(${fIdx}, ${tIdx}, this.value)" class="w-full h-full bg-transparent text-center outline-none font-bold">
-                                                <option value="none" ${val === 'none' ? 'selected' : ''}> </option>
-                                                <option value="strong" ${val === 'strong' ? 'selected' : ''}>◎</option>
-                                                <option value="medium" ${val === 'medium' ? 'selected' : ''}>○</option>
-                                                <option value="weak" ${val === 'weak' ? 'selected' : ''}>△</option>
-                                            </select>
-                                        </td>
-                                    `;
-            }).join('')}
-                            </tr>
-                        `).join('')}
+                                    const val = relations[fIdx][tIdx];
+                                    return `<td class="p-0"><select onchange="setRelation(${fIdx},${tIdx},this.value)" class="w-full h-full bg-transparent text-center outline-none font-bold">
+                                        <option value="none" ${val==='none'?'selected':''}> </option>
+                                        <option value="strong" ${val==='strong'?'selected':''}>â—Ž</option>
+                                        <option value="medium" ${val==='medium'?'selected':''}>â—‹</option>
+                                        <option value="weak" ${val==='weak'?'selected':''}>â–³</option>
+                                    </select></td>`;
+                                }).join('')}
+                            </tr>`).join('')}
                     </tbody>
                     <tfoot>
                         <tr class="bg-slate-50 font-bold">
-                            <td colspan="2" class="text-right px-4 uppercase text-slate-500">Raw Weight (Σ)</td>
+                            <td colspan="2" class="text-right px-4 uppercase text-slate-500">Raw Weight (Î£)</td>
                             ${techWeights.map(w => `<td class="text-blue-800 text-sm">${w}</td>`).join('')}
                         </tr>
                         <tr class="bg-white font-bold">
                             <td colspan="2" class="text-right px-4 uppercase text-slate-400">Prioritas (%)</td>
-                            ${techWeights.map(w => `<td>${((w / maxWeight) * 100).toFixed(0)}%</td>`).join('')}
+                            ${techWeights.map(w => `<td>${((w/maxWeight)*100).toFixed(0)}%</td>`).join('')}
                         </tr>
                     </tfoot>
-                </table>
-            `;
-            container.innerHTML = html;
+                </table>`;
         }
 
-        // Initialize when window loads
-        window.addEventListener('load', initDB);
+        window.addEventListener('load', initApp);
     </script>
 </body>
 
