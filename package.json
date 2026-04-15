@@ -1,0 +1,8 @@
+{
+  "name": "qfd-system",
+  "version": "1.0.0",
+  "description": "Kano & QFD System",
+  "scripts": {
+    "build": "echo 'No build required'"
+  }
+}
