@@ -1,8 +1,10 @@
 const { createClient } = require('@libsql/client');
 
 function getClient() {
+    // Use https:// instead of libsql:// to force HTTP mode — required for Vercel serverless
+    const url = (process.env.TURSO_URL || '').replace('libsql://', 'https://');
     return createClient({
-        url: process.env.TURSO_URL,
+        url,
         authToken: process.env.TURSO_AUTH_TOKEN,
     });
 }
@@ -27,6 +29,7 @@ module.exports = async function handler(req, res) {
             const result = await client.execute("SELECT * FROM kano_items ORDER BY id ASC");
             return res.json(result.rows);
         } catch (e) {
+            console.error('GET /api/items error:', e);
             return res.status(500).json({ error: e.message });
         }
     }
@@ -40,6 +43,7 @@ module.exports = async function handler(req, res) {
             });
             return res.json({ id: result.rows[0].id });
         } catch (e) {
+            console.error('POST /api/items error:', e);
             return res.status(500).json({ error: e.message });
         }
     }

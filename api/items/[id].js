@@ -1,10 +1,8 @@
 const { createClient } = require('@libsql/client');
 
 function getClient() {
-    return createClient({
-        url: process.env.TURSO_URL,
-        authToken: process.env.TURSO_AUTH_TOKEN,
-    });
+    const url = (process.env.TURSO_URL || '').replace('libsql://', 'https://');
+    return createClient({ url, authToken: process.env.TURSO_AUTH_TOKEN });
 }
 
 module.exports = async function handler(req, res) {
@@ -21,6 +19,7 @@ module.exports = async function handler(req, res) {
             await client.execute({ sql: "DELETE FROM kano_items WHERE id = ?", args: [id] });
             return res.json({ success: true });
         } catch (e) {
+            console.error('DELETE /api/items/[id] error:', e);
             return res.status(500).json({ error: e.message });
         }
     }
