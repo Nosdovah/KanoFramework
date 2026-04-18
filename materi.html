@@ -146,13 +146,27 @@
             <span class="text-lg font-bold">QFD <span class="text-blue-400">System</span></span>
         </div>
         <div class="flex items-center gap-4">
+            <div id="guest-badge" class="hidden items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full text-amber-500 text-[10px] font-black uppercase tracking-widest mr-2">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                Guest
+            </div>
             <a href="index.html" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition-all">
                 <i class="fas fa-arrow-left"></i> Kembali ke QFD
             </a>
             <div class="h-6 w-px bg-slate-700 hidden md:block"></div>
-            <button onclick="logout()" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-red-400 hover:bg-red-800 hover:text-white transition-all">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+            <div id="auth-section">
+                <button onclick="logout()" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-red-400 hover:bg-red-800 hover:text-white transition-all">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            <div id="guest-section" class="hidden">
+                <a href="login.html" class="flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold bg-blue-600 text-white hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20">
+                    Login
+                </a>
+            </div>
         </div>
     </div>
 </nav>
@@ -166,8 +180,13 @@
 
 <script>
 const token = localStorage.getItem('auth_token');
-if (!token) {
-    window.location.href = 'login.html';
+const isGuest = !token;
+
+if (isGuest) {
+    document.getElementById('guest-badge').classList.remove('hidden');
+    document.getElementById('guest-badge').classList.add('flex');
+    document.getElementById('guest-section').classList.remove('hidden');
+    document.getElementById('auth-section').classList.add('hidden');
 }
 
 function logout() {
