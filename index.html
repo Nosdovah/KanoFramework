@@ -542,10 +542,30 @@
 
         window.addFeaturePair = async function () {
             if (isGuest) { window.location.href = 'login.html'; return; }
-            const prob = document.getElementById('problem-input').value.trim();
-            const sol  = document.getElementById('solution-input').value.trim();
-            const story = document.getElementById('story-input').value.trim() || 'Default';
-            if (!prob || !sol) return;
+            const probInput = document.getElementById('problem-input');
+            const solInput = document.getElementById('solution-input');
+            const storyInput = document.getElementById('story-input');
+
+            const prob = probInput.value.trim();
+            const sol  = solInput.value.trim();
+            const story = storyInput.value.trim();
+
+            if (!story || !prob || !sol) {
+                if (!story) storyInput.classList.add('border-red-500');
+                if (!prob) probInput.classList.add('border-red-500');
+                if (!sol) solInput.classList.add('border-red-500');
+                
+                // Remove red border after 2 seconds
+                setTimeout(() => {
+                    storyInput.classList.remove('border-red-500');
+                    probInput.classList.remove('border-red-500');
+                    solInput.classList.remove('border-red-500');
+                }, 2000);
+                
+                alert("Mohon isi semua field: Story Context, Masalah, dan Solusi.");
+                return;
+            }
+
             const initialRelations = Array(technicalRequirements.length).fill('none');
             try {
                 const res = await fetch(`${API_URL}/items`, {
@@ -559,8 +579,11 @@
                 relations.push(initialRelations);
                 updateStoryFilterOptions();
                 renderFeaturePairs();
-                document.getElementById('problem-input').value = "";
-                document.getElementById('solution-input').value = "";
+                
+                // Clear inputs
+                probInput.value = "";
+                solInput.value = "";
+                // Note: Keeping story context to allow multiple entries for the same story easily
             } catch (e) { console.error("Failed to add item:", e); alert("Gagal menyimpan: " + e.message); }
         }
 
