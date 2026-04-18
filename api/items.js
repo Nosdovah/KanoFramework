@@ -3,33 +3,53 @@ const { tursoQuery, authenticate } = require('./_utils/db');
 const EXAMPLE_ITEMS = [
     {
         id: "ex1",
-        problem: "Information Overload: Terlalu banyak pesan atau notifikasi yang tidak relevan sehingga mengganggu fokus.",
-        solution: "Sistem AI Filter untuk mengelompokkan notifikasi berdasarkan tingkat relevansi bagi tiap pengguna.",
-        story_context: "Professional Network v1",
-        kano_f: "Suka",
+        problem: "Konten dan interaksi dalam komunitas belum cukup relevan dan aplikatif untuk mendukung pertumbuhan profesional pengguna.",
+        solution: "Menyediakan kurasi konten dan program berbasis kebutuhan karier pengguna, misalnya mentoring dan diskusi berbasis bidang profesi.",
+        story_context: "Community Platform v1",
+        kano_f: "Tidak Suka",
         kano_d: "Tidak Suka",
-        kano_category: "O",
-        relations: JSON.stringify(["strong", "medium", "strong", "none", "none", "strong", "none"])
+        kano_category: "M",
+        relations: JSON.stringify(["medium", "weak", "strong", "strong", "medium", "medium", "weak"])
     },
     {
         id: "ex2",
-        problem: "Fear of Ghosting: Ketakutan bahwa pertanyaan atau pendapat yang dilempar tidak akan mendapat respon.",
-        solution: "Fitur 'Reciprocity Tracker' yang memberikan reward bagi anggota yang sering menanggapi pertanyaan baru.",
-        story_context: "Professional Network v1",
+        problem: "Pengguna mengalami kesulitan menyaring informasi sehingga membutuhkan waktu yang lama untuk mendapatkan insight yang relevan.",
+        solution: "Mengembangkan sistem ringkasan dan personalisasi konten agar pengguna dapat memperoleh informasi penting secara cepat dan efisien.",
+        story_context: "Community Platform v1",
         kano_f: "Suka",
         kano_d: "Netral",
         kano_category: "A",
-        relations: JSON.stringify(["none", "none", "medium", "strong", "none", "medium", "none"])
+        relations: JSON.stringify(["medium", "weak", "strong", "weak", "strong", "strong", "strong"])
     },
     {
         id: "ex3",
-        problem: "Entry Barrier: Tidak tahu harus mulai dari mana saat pertama kali bergabung.",
-        solution: "Modul Onboarding Interaktif yang memandu user mengisi profil dan merekomendasikan 3 diskusi pertama.",
-        story_context: "Professional Network v1",
-        kano_f: "Harus Ada",
+        problem: "Tingkat partisipasi anggota rendah sehingga interaksi dalam komunitas tidak konsisten dan kurang hidup.",
+        solution: "Menerapkan mekanisme peningkatan engagement seperti aktivasi diskusi dan peran moderator yang proaktif.",
+        story_context: "Community Platform v1",
+        kano_f: "Tidak Suka",
         kano_d: "Tidak Suka",
         kano_category: "M",
-        relations: JSON.stringify(["none", "none", "none", "medium", "none", "strong", "none"])
+        relations: JSON.stringify(["strong", "strong", "strong", "strong", "strong", "strong", "strong"])
+    },
+    {
+        id: "ex4",
+        problem: "Pengguna merasa ragu untuk berpendapat karena takut tidak mendapat respon atau dinilai negatif.",
+        solution: "Menciptakan lingkungan yang suportif dengan mekanisme respon yang lebih inklusif dan cepat.",
+        story_context: "Community Platform v1",
+        kano_f: "Tidak Suka",
+        kano_d: "Tidak Suka",
+        kano_category: "M",
+        relations: JSON.stringify(["strong", "strong", "strong", "strong", "strong", "strong", "weak"])
+    },
+    {
+        id: "ex5",
+        problem: "Pengguna tidak memiliki motivasi yang cukup kuat untuk berpartisipasi aktif dalam komunitas.",
+        solution: "Menyediakan insentif dan sistem partisipasi yang mudah serta memberikan manfaat nyata bagi pengguna.",
+        story_context: "Community Platform v1",
+        kano_f: "Tidak Suka",
+        kano_d: "Tidak Suka",
+        kano_category: "M",
+        relations: JSON.stringify(["weak", "weak", "medium", "strong", "medium", "strong", "weak"])
     }
 ];
 
