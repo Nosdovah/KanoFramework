@@ -68,12 +68,20 @@ async function initDb() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER,
             problem TEXT, solution TEXT,
+            story_context TEXT DEFAULT '',
             kano_f TEXT, kano_d TEXT, kano_category TEXT, relations TEXT
         )`);
         
         // Add user_id column if it doesn't exist (for existing tables)
         try {
             await tursoQuery(`ALTER TABLE kano_items ADD COLUMN user_id INTEGER`);
+        } catch (e) {
+            // Ignore error if column already exists
+        }
+
+        // Add story_context column if it doesn't exist (for existing tables)
+        try {
+            await tursoQuery(`ALTER TABLE kano_items ADD COLUMN story_context TEXT DEFAULT ''`);
         } catch (e) {
             // Ignore error if column already exists
         }

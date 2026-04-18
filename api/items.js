@@ -35,11 +35,11 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-        const { problem, solution, relations } = req.body;
+        const { problem, solution, relations, story_context } = req.body;
         try {
             const { lastInsertRowid } = await tursoQuery(
-                "INSERT INTO kano_items (user_id, problem, solution, kano_f, kano_d, kano_category, relations) VALUES (?, ?, ?, '', '', '', ?)",
-                [user_id, problem, solution, relations]
+                "INSERT INTO kano_items (user_id, problem, solution, story_context, kano_f, kano_d, kano_category, relations) VALUES (?, ?, ?, ?, '', '', '', ?)",
+                [user_id, problem, solution, story_context || '', relations]
             );
             return res.status(200).json({ id: lastInsertRowid });
         } catch (e) {
