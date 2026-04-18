@@ -487,6 +487,7 @@
                     } catch { relations.push(Array(technicalRequirements.length).fill('none')); }
                 });
                 renderFeaturePairs(); renderKanoTesting(); renderHoQ();
+                window.drawKanoGraph();
             } catch (e) { console.error("Error loading data:", e); }
         }
 
@@ -580,6 +581,7 @@
                 </div>
             `).join('');
             features.forEach((_, i) => updateBadgeColor(i, kanoData[i].category));
+            window.drawKanoGraph();
         }
 
         function updateBadgeColor(idx, cat) {
@@ -616,24 +618,44 @@
             const canvas = document.getElementById('kanoCanvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, 400, 400);
-            ctx.strokeStyle = '#e2e8f0'; ctx.setLineDash([5, 5]);
-            ctx.beginPath(); ctx.moveTo(200, 20); ctx.lineTo(200, 380); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(20, 200); ctx.lineTo(380, 200); ctx.stroke();
+            const w = canvas.width;
+            const h = canvas.height;
+            const pad = 40;
+
+            ctx.clearRect(0, 0, w, h);
+            
+            // Draw Axis
+            ctx.strokeStyle = '#94a3b8'; ctx.setLineDash([5, 5]); ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(w/2, pad); ctx.lineTo(w/2, h-pad); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(pad, h/2); ctx.lineTo(w-pad, h/2); ctx.stroke();
             ctx.setLineDash([]);
+
+            // Draw Quadrant Labels
+            ctx.font = 'bold 14px Inter'; ctx.textAlign = 'center';
+            ctx.fillStyle = '#10b981'; ctx.fillText('A', w*0.25, h*0.25); // Attractive
+            ctx.fillStyle = '#2563eb'; ctx.fillText('O', w*0.75, h*0.25); // One-dimensional
+            ctx.fillStyle = '#dc2626'; ctx.fillText('M', w*0.75, h*0.75); // Must-be
+            ctx.fillStyle = '#94a3b8'; ctx.fillText('I', w*0.25, h*0.75); // Indifferent
+
             kanoData.forEach((d, i) => {
                 if (!d.category) return;
-                let x = 200, y = 200;
-                if (d.category === 'A') { x = 120; y = 120; }
-                if (d.category === 'O') { x = 280; y = 120; }
-                if (d.category === 'M') { x = 280; y = 280; }
-                const scatter = (i * 15) % 40 - 20;
+                let x = w/2, y = h/2;
+                if (d.category === 'A') { x = w*0.25; y = h*0.25; }
+                if (d.category === 'O') { x = w*0.75; y = h*0.25; }
+                if (d.category === 'M') { x = w*0.75; y = h*0.75; }
+                if (d.category === 'I') { x = w*0.25; y = h*0.75; }
+                
+                const scatter = (i * 12) % 30 - 15;
                 x += scatter; y += scatter;
-                ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2);
-                ctx.fillStyle = d.category === 'M' ? '#dc2626' : d.category === 'O' ? '#2563eb' : d.category === 'A' ? '#10b981' : '#94a3b8';
+                
+                ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI * 2);
+                ctx.fillStyle = d.category === 'M' ? '#dc2626' : d.category === 'O' ? '#2563eb' : d.category === 'A' ? '#10b981' : '#cbd5e1';
                 ctx.fill();
-                ctx.fillStyle = '#1e293b'; ctx.font = 'bold 10px Inter';
-                ctx.fillText(features[i].solution.substring(0, 10), x + 10, y + 4);
+                ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
+                
+                ctx.fillStyle = '#1e293b'; ctx.font = '800 10px Inter'; ctx.textAlign = 'left';
+                const label = features[i]?.solution ? features[i].solution.substring(0, 15) + (features[i].solution.length > 15 ? '...' : '') : 'Item ' + (i+1);
+                ctx.fillText(label, x + 10, y + 4);
             });
         }
 
