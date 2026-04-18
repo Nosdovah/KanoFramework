@@ -350,7 +350,7 @@
                     <!-- Daftar Hasil Identifikasi -->
                     <div class="flex justify-between items-center mb-4 border-b pb-2">
                         <h3 class="text-sm font-bold text-slate-700 uppercase tracking-tight">Daftar Hasil Identifikasi</h3>
-                        <select id="story-filter-step1" onchange="onStoryFilterStep1Change()" class="text-[10px] p-1.5 border rounded bg-white outline-none font-bold text-blue-600">
+                        <select id="story-filter-step1" onchange="onStoryFilterStep1Change()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
                             <option value="ALL">Semua Story</option>
                         </select>
                     </div>
@@ -369,7 +369,7 @@
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold text-slate-800">2. Klasifikasi Kano & Pemetaan</h2>
                         <div class="flex items-center gap-4">
-                            <select id="story-filter" onchange="onStoryFilterChange()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600">
+                            <select id="story-filter" onchange="onStoryFilterChange()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
                                 <option value="ALL">Semua Story</option>
                             </select>
                         </div>
@@ -413,9 +413,9 @@
                         <h2 class="text-2xl font-black text-slate-800 flex items-center">
                             <i class="fas fa-home mr-3 text-blue-800"></i> House of Quality Matrix
                         </h2>
-                        <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border">
+                        <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border shadow-sm">
                             <label class="text-[10px] font-bold text-slate-500 uppercase">Filter Story:</label>
-                            <select id="story-filter-hoq" onchange="onStoryFilterHoQChange()" class="text-xs p-1.5 border rounded bg-white outline-none font-bold text-blue-600 min-w-[150px]">
+                            <select id="story-filter-hoq" onchange="onStoryFilterHoQChange()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
                                 <!-- Options will be populated by JS without 'Semua Story' -->
                             </select>
                         </div>
