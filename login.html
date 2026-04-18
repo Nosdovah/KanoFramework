@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,31 +48,40 @@
         }
     </style>
 </head>
+
 <body class="min-h-screen flex items-center justify-center p-4">
 
     <div class="glass-panel w-full max-w-md rounded-2xl p-8 shadow-2xl relative overflow-hidden">
         <!-- Decoration -->
-        <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-600 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse"></div>
-        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-amber-500 rounded-full mix-blend-multiply filter blur-2xl opacity-40"></div>
+        <div
+            class="absolute -top-10 -right-10 w-40 h-40 bg-blue-600 rounded-full mix-blend-multiply filter blur-2xl opacity-40 animate-pulse">
+        </div>
+        <div
+            class="absolute -bottom-10 -left-10 w-40 h-40 bg-amber-500 rounded-full mix-blend-multiply filter blur-2xl opacity-40">
+        </div>
 
         <div class="text-center mb-8 relative z-10">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 border border-slate-700 mb-4 shadow-lg">
+            <div
+                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-800 border border-slate-700 mb-4 shadow-lg">
                 <i class="fas fa-microchip text-blue-400 text-3xl"></i>
             </div>
-            <h1 class="text-3xl font-bold tracking-tight mb-2">Welcome Back</h1>
+            <h1 class="text-3xl font-bold tracking-tight mb-2">Welcome</h1>
             <p class="text-slate-400 text-sm">Sign in to continue to QFD System</p>
         </div>
 
         <form id="loginForm" class="space-y-6 relative z-10">
-            <div id="errorMsg" class="hidden bg-red-500/20 border border-red-500/50 text-red-200 text-sm p-3 rounded-lg text-center"></div>
-            
+            <div id="errorMsg"
+                class="hidden bg-red-500/20 border border-red-500/50 text-red-200 text-sm p-3 rounded-lg text-center">
+            </div>
+
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-2">Username</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-user text-slate-500"></i>
                     </div>
-                    <input type="text" id="username" required class="input-field w-full pl-10 pr-3 py-3 rounded-lg" placeholder="johndoe">
+                    <input type="text" id="username" required class="input-field w-full pl-10 pr-3 py-3 rounded-lg"
+                        placeholder="johndoe">
                 </div>
             </div>
 
@@ -81,17 +91,19 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-lock text-slate-500"></i>
                     </div>
-                    <input type="password" id="password" required class="input-field w-full pl-10 pr-3 py-3 rounded-lg" placeholder="••••••••">
+                    <input type="password" id="password" required class="input-field w-full pl-10 pr-3 py-3 rounded-lg"
+                        placeholder="••••••••">
                 </div>
             </div>
 
-            <button type="submit" id="submitBtn" class="btn-primary w-full py-3 rounded-lg font-semibold text-white flex justify-center items-center">
+            <button type="submit" id="submitBtn"
+                class="btn-primary w-full py-3 rounded-lg font-semibold text-white flex justify-center items-center">
                 <span>Sign In</span>
             </button>
         </form>
 
         <div class="mt-6 text-center text-sm text-slate-400 relative z-10">
-            Don't have an account? 
+            Don't have an account?
             <a href="signup.html" class="text-blue-400 hover:text-blue-300 font-semibold transition-colors">Sign up</a>
         </div>
     </div>
@@ -119,9 +131,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
-                
+
                 const data = await res.json();
-                
+
                 if (res.ok) {
                     localStorage.setItem('auth_token', data.token);
                     localStorage.setItem('username', data.username);
@@ -139,4 +151,5 @@
         });
     </script>
 </body>
+
 </html>
