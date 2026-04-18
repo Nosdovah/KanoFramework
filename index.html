@@ -103,41 +103,60 @@
 <body class="min-h-screen flex flex-col">
 
     <!-- NAV BAR -->
-    <nav class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <nav class="bg-slate-900 text-slate-100 shadow-xl border-b border-slate-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
-                    <i class="fas fa-microchip text-blue-400 text-xl"></i>
-                    <span class="text-lg font-bold tracking-tight">QFD <span class="text-blue-400">System</span></span>
+                <!-- Left: Branding & Status -->
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-microchip text-blue-400 text-2xl"></i>
+                        <h1 class="text-lg font-extrabold tracking-tight">QFD <span class="text-blue-400">System</span></h1>
+                    </div>
+                    
+                    <div id="guest-alert" class="hidden flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full text-amber-500 text-[10px] font-black uppercase tracking-widest">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                        </span>
+                        Guest Mode
+                    </div>
                 </div>
-                <!-- Guest Mode Alert -->
-                <div id="guest-alert" class="hidden bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full text-amber-500 text-[10px] font-bold uppercase tracking-tighter ml-4">
-                    <i class="fas fa-eye mr-1"></i> Example Mode (Read Only)
-                </div>
-                <div class="flex space-x-1 overflow-x-auto no-scrollbar whitespace-nowrap ml-4">
-                    <button onclick="switchTab('studi-kasus')"
-                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800 flex-shrink-0 text-sm md:text-base"
-                        id="btn-studi-kasus">Contoh Studi Kasus</button>
-                    <button onclick="switchTab('kano-module')"
-                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800 flex-shrink-0 text-sm md:text-base"
-                        id="btn-kano-module">Analisis Kano</button>
-                    <button onclick="switchTab('hoq-module')"
-                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-slate-800 flex-shrink-0 text-sm md:text-base"
-                        id="btn-hoq-module">House of Quality</button>
-                    <a href="materi.html"
-                        class="px-4 py-2 rounded-md transition-colors hover:bg-slate-800 text-amber-400 font-semibold flex items-center gap-2 flex-shrink-0 text-sm md:text-base">
-                        <i class="fas fa-book-open text-sm"></i>Studi Kasus Kl.5
-                    </a>
-                    <div class="h-6 w-px bg-slate-700 mx-2 self-center hidden md:block"></div>
-                    <div id="auth-buttons">
-                        <button onclick="logout()"
-                            class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-red-800 hover:text-white text-red-400 flex-shrink-0 text-sm md:text-base font-semibold">
-                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+
+                <!-- Right: Navigation & Auth -->
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center bg-slate-800/50 rounded-lg p-1 mr-2 no-scrollbar overflow-x-auto">
+                        <button onclick="switchTab('studi-kasus')" id="btn-studi-kasus"
+                            class="nav-btn px-4 py-1.5 rounded-md text-sm font-medium transition-all hover:bg-slate-700 whitespace-nowrap">
+                            Dashboard
+                        </button>
+                        <button onclick="switchTab('kano-module')" id="btn-kano-module"
+                            class="nav-btn px-4 py-1.5 rounded-md text-sm font-medium transition-all hover:bg-slate-700 whitespace-nowrap">
+                            Analisis Kano
+                        </button>
+                        <button onclick="switchTab('hoq-module')" id="btn-hoq-module"
+                            class="nav-btn px-4 py-1.5 rounded-md text-sm font-medium transition-all hover:bg-slate-700 whitespace-nowrap">
+                            House of Quality
                         </button>
                     </div>
+
+                    <div class="h-6 w-px bg-slate-700 mx-1 hidden md:block"></div>
+
+                    <a href="materi.html"
+                        class="px-4 py-2 rounded-lg text-amber-400 hover:bg-amber-400/10 transition-all font-bold flex items-center gap-2 text-sm whitespace-nowrap">
+                        <i class="fas fa-book-open"></i> <span class="hidden lg:inline">Materi</span>
+                    </a>
+
+                    <div id="auth-buttons">
+                        <button onclick="logout()"
+                            class="px-4 py-2 rounded-lg text-red-400 hover:bg-red-400/10 transition-all font-bold flex items-center gap-2 text-sm">
+                            <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span>
+                        </button>
+                    </div>
+                    
                     <div id="guest-buttons" class="hidden">
                         <a href="login.html"
-                            class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-blue-800 hover:text-white text-blue-400 flex-shrink-0 text-sm md:text-base font-semibold">
-                            <i class="fas fa-sign-in-alt mr-1"></i>Login
+                            class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-all font-bold shadow-lg shadow-blue-500/20 text-sm">
+                            Login
                         </a>
                     </div>
                 </div>
