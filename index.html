@@ -57,6 +57,16 @@
             font-weight: bold;
         }
 
+        .kano-label-I {
+            color: #94a3b8;
+            font-weight: bold;
+        }
+
+        .kano-label-R {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
         .hoq-table th,
         .hoq-table td {
             border: 1px solid #cbd5e1;
@@ -401,7 +411,7 @@
                 </div>
                 <div class="bg-white p-4 rounded-lg border text-[11px]">
                     <h4 class="font-bold mb-2">Prioritas Kano:</h4>
-                    <p>M (Bobot 5) | O (Bobot 3) | A (Bobot 1)</p>
+                    <p>M (9) | O (3) | A (1) | I (0) | R (-9)</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg border text-[11px]">
                     <h4 class="font-bold mb-2">Technical Target:</h4>
@@ -592,6 +602,7 @@
             if (cat === 'M') colorClass = 'bg-red-100 text-red-600 border-red-200';
             if (cat === 'O') colorClass = 'bg-blue-100 text-blue-600 border-blue-200';
             if (cat === 'A') colorClass = 'bg-green-100 text-green-600 border-green-200';
+            if (cat === 'R') colorClass = 'bg-purple-100 text-purple-600 border-purple-200';
             badge.className = `text-[9px] px-2 py-0.5 rounded border uppercase font-black ${colorClass}`;
         }
 
@@ -674,14 +685,17 @@
 
         function renderHoQ() {
             const container = document.getElementById('hoq-matrix-root');
-            const validIndices = features.map((_, i) => i).filter(i => kanoData[i]?.category && !['I', 'R', 'Q'].includes(kanoData[i].category));
+            const kanoWeights = { 'M': 9, 'O': 3, 'A': 1, 'I': 0, 'R': -9, 'Q': 0 };
+            const validIndices = features.map((_, i) => i).filter(i => kanoData[i]?.category);
+            
             if (validIndices.length === 0) {
-                container.innerHTML = `<div class="p-20 text-center text-slate-400 italic">Selesaikan evaluasi Kano untuk fitur prioritas (M, O, atau A)...</div>`;
+                container.innerHTML = `<div class="p-20 text-center text-slate-400 italic">Selesaikan evaluasi Kano untuk melihat matriks...</div>`;
                 return;
             }
+
             const techWeights = technicalRequirements.map((_, tIdx) =>
                 validIndices.reduce((sum, fIdx) => {
-                    const imp = kanoData[fIdx].category === 'M' ? 5 : kanoData[fIdx].category === 'O' ? 3 : 1;
+                    const imp = kanoWeights[kanoData[fIdx].category] || 0;
                     return sum + (imp * relScores[relations[fIdx][tIdx]]);
                 }, 0)
             );
@@ -724,7 +738,10 @@
                         </tr>
                         <tr class="bg-white font-bold">
                             <td colspan="2" class="text-right px-4 uppercase text-slate-400">Prioritas (%)</td>
-                            ${techWeights.map(w => `<td>${((w/maxWeight)*100).toFixed(0)}%</td>`).join('')}
+                            ${techWeights.map(w => {
+                                const val = w === 0 ? 0 : (w/maxWeight)*100;
+                                return `<td class="${w < 0 ? 'text-red-500' : ''}">${val.toFixed(0)}%</td>`;
+                            }).join('')}
                         </tr>
                     </tfoot>
                 </table>`;
