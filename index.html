@@ -409,9 +409,17 @@
         <section id="hoq-module" class="tab-content">
             <div class="bg-white rounded-xl shadow-lg p-6 border border-slate-200 overflow-x-auto">
                 <div class="min-w-[1000px]">
-                    <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center">
-                        <i class="fas fa-home mr-3 text-blue-800"></i> House of Quality Matrix
-                    </h2>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-black text-slate-800 flex items-center">
+                            <i class="fas fa-home mr-3 text-blue-800"></i> House of Quality Matrix
+                        </h2>
+                        <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase">Filter Story:</label>
+                            <select id="story-filter-hoq" onchange="onStoryFilterHoQChange()" class="text-xs p-1.5 border rounded bg-white outline-none font-bold text-blue-600 min-w-[150px]">
+                                <option value="ALL">Semua Story</option>
+                            </select>
+                        </div>
+                    </div>
 
                     <div id="hoq-matrix-root">
                         <!-- Konten HoQ akan di-generate oleh JS -->
@@ -476,6 +484,7 @@
         let relations = [];
         let selectedStory = "ALL";
         let selectedStoryStep1 = "ALL";
+        let selectedStoryHoQ = "ALL";
 
         const relScores = { 'none': 0, 'strong': 9, 'medium': 3, 'weak': 1 };
         const technicalRequirements = [
@@ -522,6 +531,7 @@
         function updateStoryFilterOptions() {
             const filter1 = document.getElementById('story-filter-step1');
             const filter2 = document.getElementById('story-filter');
+            const filterHoQ = document.getElementById('story-filter-hoq');
             const stories = [...new Set(features.map(f => f.story))];
             
             if (filter1) {
@@ -534,11 +544,21 @@
                 filter2.innerHTML = '<option value="ALL">Semua Story</option>' + 
                     stories.map(s => `<option value="${s}" ${s === cur2 ? 'selected' : ''}>${s}</option>`).join('');
             }
+            if (filterHoQ) {
+                const curH = filterHoQ.value;
+                filterHoQ.innerHTML = '<option value="ALL">Semua Story</option>' + 
+                    stories.map(s => `<option value="${s}" ${s === curH ? 'selected' : ''}>${s}</option>`).join('');
+            }
         }
 
         window.onStoryFilterStep1Change = function() {
             selectedStoryStep1 = document.getElementById('story-filter-step1').value;
             renderFeaturePairs();
+        }
+
+        window.onStoryFilterHoQChange = function() {
+            selectedStoryHoQ = document.getElementById('story-filter-hoq').value;
+            renderHoQ();
         }
 
         window.onStoryFilterChange = function() {
@@ -788,7 +808,7 @@
             const kanoWeights = { 'M': 9, 'O': 3, 'A': 1, 'I': 0, 'R': -9, 'Q': 0 };
             
             const validIndices = features.map((_, i) => i)
-                .filter(i => kanoData[i]?.category && (selectedStory === "ALL" || features[i].story === selectedStory));
+                .filter(i => kanoData[i]?.category && (selectedStoryHoQ === "ALL" || features[i].story === selectedStoryHoQ));
             
             if (validIndices.length === 0) {
                 container.innerHTML = `<div class="p-20 text-center text-slate-400 italic">Selesaikan evaluasi Kano untuk melihat matriks...</div>`;
