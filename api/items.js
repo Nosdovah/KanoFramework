@@ -11,7 +11,17 @@ module.exports = async function handler(req, res) {
     try {
         user_id = await authenticate(req);
     } catch (e) {
-        return res.status(401).json({ error: e.message });
+        if (req.method === 'GET') {
+            // Guest mode: Fallback to raihanhaniffirdaus@gmail.com for example data
+            const { rows } = await tursoQuery("SELECT id FROM users WHERE username = ?", ["raihanhaniffirdaus@gmail.com"]);
+            if (rows.length > 0) {
+                user_id = rows[0].id;
+            } else {
+                return res.status(401).json({ error: "Please log in" });
+            }
+        } else {
+            return res.status(401).json({ error: e.message });
+        }
     }
 
     if (req.method === 'GET') {

@@ -106,9 +106,12 @@
     <nav class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-3">
                     <i class="fas fa-microchip text-blue-400 text-xl"></i>
                     <span class="text-lg font-bold tracking-tight">QFD <span class="text-blue-400">System</span></span>
+                </div>
+                <!-- Guest Mode Alert -->
+                <div id="guest-alert" class="hidden bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full text-amber-500 text-[10px] font-bold uppercase tracking-tighter ml-4">
+                    <i class="fas fa-eye mr-1"></i> Example Mode (Read Only)
                 </div>
                 <div class="flex space-x-1 overflow-x-auto no-scrollbar whitespace-nowrap ml-4">
                     <button onclick="switchTab('studi-kasus')"
@@ -125,10 +128,18 @@
                         <i class="fas fa-book-open text-sm"></i>Studi Kasus Kl.5
                     </a>
                     <div class="h-6 w-px bg-slate-700 mx-2 self-center hidden md:block"></div>
-                    <button onclick="logout()"
-                        class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-red-800 hover:text-white text-red-400 flex-shrink-0 text-sm md:text-base font-semibold">
-                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
-                    </button>
+                    <div id="auth-buttons">
+                        <button onclick="logout()"
+                            class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-red-800 hover:text-white text-red-400 flex-shrink-0 text-sm md:text-base font-semibold">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                        </button>
+                    </div>
+                    <div id="guest-buttons" class="hidden">
+                        <a href="login.html"
+                            class="nav-btn px-4 py-2 rounded-md transition-colors hover:bg-blue-800 hover:text-white text-blue-400 flex-shrink-0 text-sm md:text-base font-semibold">
+                            <i class="fas fa-sign-in-alt mr-1"></i>Login
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -367,7 +378,7 @@
             <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-4 rounded-lg border text-[11px]">
                     <h4 class="font-bold mb-2">Simbol Hubungan:</h4>
-                    <p>â—Ž Strong (9) | â—‹ Medium (3) | â–³ Weak (1)</p>
+                    <p>◎ Strong (9) | ○ Medium (3) | △ Weak (1)</p>
                 </div>
                 <div class="bg-white p-4 rounded-lg border text-[11px]">
                     <h4 class="font-bold mb-2">Prioritas Kano:</h4>
@@ -375,7 +386,7 @@
                 </div>
                 <div class="bg-white p-4 rounded-lg border text-[11px]">
                     <h4 class="font-bold mb-2">Technical Target:</h4>
-                    <p>Raw Weight = Î£ (Relationship Ã— Kano Importance)</p>
+                    <p>Raw Weight = Σ (Relationship × Kano Importance)</p>
                 </div>
             </div>
         </section>
@@ -383,8 +394,12 @@
 
     <script>
         const token = localStorage.getItem('auth_token');
-        if (!token) {
-            window.location.href = 'login.html';
+        const isGuest = !token;
+
+        if (isGuest) {
+            document.getElementById('guest-alert').classList.remove('hidden');
+            document.getElementById('guest-buttons').classList.remove('hidden');
+            document.getElementById('auth-buttons').classList.add('hidden');
         }
 
         const originalFetch = window.fetch;
@@ -393,10 +408,12 @@
             if(resource.toString().startsWith('/api')) {
                 config = config || {};
                 config.headers = config.headers || {};
-                config.headers['Authorization'] = `Bearer ${token}`;
+                if (token) {
+                    config.headers['Authorization'] = `Bearer ${token}`;
+                }
             }
             const response = await originalFetch(resource, config);
-            if(response.status === 401) {
+            if(response.status === 401 && token) {
                 logout();
             }
             return response;
@@ -467,6 +484,7 @@
         }
 
         window.addFeaturePair = async function () {
+            if (isGuest) { alert("Silahkan login untuk menambahkan fitur."); return; }
             const prob = document.getElementById('problem-input').value.trim();
             const sol  = document.getElementById('solution-input').value.trim();
             if (!prob || !sol) return;
@@ -488,6 +506,7 @@
         }
 
         window.deleteFeaturePair = async function (index) {
+            if (isGuest) { alert("Silahkan login untuk menghapus data."); return; }
             const dbId = features[index].dbId;
             try {
                 await fetch(`${API_URL}/items/${dbId}`, { method: 'DELETE' });
@@ -509,9 +528,10 @@
                         <span class="text-[10px] font-bold text-blue-600 uppercase">Solusi:</span>
                         <p class="text-xs font-semibold text-slate-800">${f.solution}</p>
                     </div>
+                    ${!isGuest ? `
                     <button onclick="deleteFeaturePair(${i})" class="text-slate-300 hover:text-red-500 p-2">
                         <i class="fas fa-trash"></i>
-                    </button>
+                    </button>` : ''}
                 </div>
             `).join('');
         }
@@ -529,11 +549,11 @@
                         <div id="badge-${i}" class="text-[9px] px-2 py-0.5 rounded border uppercase font-black bg-white">UNCLASSIFIED</div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
-                        <select onchange="updateKano(${i}, 'f', this.value)" class="text-[11px] p-2 border rounded bg-white outline-none">
+                        <select ${isGuest ? 'disabled' : ''} onchange="updateKano(${i}, 'f', this.value)" class="text-[11px] p-2 border rounded bg-white outline-none">
                             <option value="">Jika fitur ADA...</option>
                             ${opts.map(o => `<option value="${o}" ${kanoData[i].f === o ? 'selected' : ''}>${o}</option>`).join('')}
                         </select>
-                        <select onchange="updateKano(${i}, 'd', this.value)" class="text-[11px] p-2 border rounded bg-white outline-none">
+                        <select ${isGuest ? 'disabled' : ''} onchange="updateKano(${i}, 'd', this.value)" class="text-[11px] p-2 border rounded bg-white outline-none">
                             <option value="">Jika fitur TIDAK ADA...</option>
                             ${opts.map(o => `<option value="${o}" ${kanoData[i].d === o ? 'selected' : ''}>${o}</option>`).join('')}
                         </select>
@@ -555,6 +575,7 @@
         }
 
         window.updateKano = async function (idx, type, val) {
+            if (isGuest) return;
             kanoData[idx][type] = val;
             let cat = kanoData[idx].category || "";
             if (kanoData[idx].f && kanoData[idx].d) {
@@ -598,6 +619,7 @@
         }
 
         window.setRelation = async function (fIdx, tIdx, scoreKey) {
+            if (isGuest) return;
             relations[fIdx][tIdx] = scoreKey;
             renderHoQ();
             try {
@@ -641,20 +663,22 @@
                                     <div class="text-blue-700 font-bold text-xs mt-1">Sol: ${features[fIdx].solution}</div>
                                 </td>
                                 <td class="font-black text-center kano-label-${kanoData[fIdx].category}">${kanoData[fIdx].category}</td>
-                                ${technicalRequirements.map((_, tIdx) => {
+                                ${technicalRequirements.map((tr, tIdx) => {
                                     const val = relations[fIdx][tIdx];
+                                    const sym = val === 'strong' ? '◎' : val === 'medium' ? '○' : val === 'weak' ? '△' : '';
+                                    if (isGuest) return `<td class="text-center font-bold text-lg">${sym}</td>`;
                                     return `<td class="p-0"><select onchange="setRelation(${fIdx},${tIdx},this.value)" class="w-full h-full bg-transparent text-center outline-none font-bold">
                                         <option value="none" ${val==='none'?'selected':''}> </option>
-                                        <option value="strong" ${val==='strong'?'selected':''}>â—Ž</option>
-                                        <option value="medium" ${val==='medium'?'selected':''}>â—‹</option>
-                                        <option value="weak" ${val==='weak'?'selected':''}>â–³</option>
+                                        <option value="strong" ${val==='strong'?'selected':''}>◎</option>
+                                        <option value="medium" ${val==='medium'?'selected':''}>○</option>
+                                        <option value="weak" ${val==='weak'?'selected':''}>△</option>
                                     </select></td>`;
                                 }).join('')}
                             </tr>`).join('')}
                     </tbody>
                     <tfoot>
                         <tr class="bg-slate-50 font-bold">
-                            <td colspan="2" class="text-right px-4 uppercase text-slate-500">Raw Weight (Î£)</td>
+                            <td colspan="2" class="text-right px-4 uppercase text-slate-500">Raw Weight (Σ)</td>
                             ${techWeights.map(w => `<td class="text-blue-800 text-sm">${w}</td>`).join('')}
                         </tr>
                         <tr class="bg-white font-bold">
