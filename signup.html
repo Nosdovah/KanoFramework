@@ -36,14 +36,30 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
+        .input-field.is-taken {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+        }
+
+        .input-field.is-available {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+        }
+
         .btn-primary {
-            background: linear-gradient(to right, #2563eb, #3b82f6);
+            background: linear-gradient(to right, #0d9488, #14b8a6);
             transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
     </style>
 </head>
@@ -62,53 +78,153 @@
             <p class="text-slate-400 text-sm">Join the QFD System platform</p>
         </div>
 
-        <form id="signupForm" class="space-y-6 relative z-10">
+        <form id="signupForm" class="space-y-5 relative z-10">
             <div id="errorMsg" class="hidden bg-red-500/20 border border-red-500/50 text-red-200 text-sm p-3 rounded-lg text-center"></div>
-            
+
+            <!-- Username with live availability check -->
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-2">Username</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-user text-slate-500"></i>
                     </div>
-                    <input type="text" id="username" required minlength="3" class="input-field w-full pl-10 pr-3 py-3 rounded-lg" placeholder="johndoe">
+                    <input type="text" id="username" required minlength="3" autocomplete="off"
+                        class="input-field w-full pl-10 pr-10 py-3 rounded-lg" placeholder="johndoe">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                        <i id="usernameIcon" class="fas text-sm hidden"></i>
+                    </div>
                 </div>
+                <p id="usernameHint" class="text-xs mt-2 text-slate-500">At least 3 characters.</p>
             </div>
 
+            <!-- Password -->
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-2">Password</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-lock text-slate-500"></i>
                     </div>
-                    <input type="password" id="password" required minlength="6" class="input-field w-full pl-10 pr-3 py-3 rounded-lg" placeholder="••••••••">
+                    <input type="password" id="password" required minlength="6"
+                        class="input-field w-full pl-10 pr-3 py-3 rounded-lg" placeholder="••••••••">
                 </div>
                 <p class="text-xs text-slate-500 mt-2">Must be at least 6 characters.</p>
             </div>
 
-            <button type="submit" id="submitBtn" class="btn-primary w-full py-3 rounded-lg font-semibold text-white flex justify-center items-center">
+            <!-- Confirm Password -->
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2">Confirm Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-slate-500"></i>
+                    </div>
+                    <input type="password" id="confirmPassword" required
+                        class="input-field w-full pl-10 pr-3 py-3 rounded-lg" placeholder="••••••••">
+                </div>
+                <p id="confirmHint" class="text-xs mt-2 hidden"></p>
+            </div>
+
+            <button type="submit" id="submitBtn"
+                class="btn-primary w-full py-3 rounded-lg font-semibold text-white flex justify-center items-center">
                 <span>Sign Up</span>
             </button>
         </form>
 
         <div class="mt-6 text-center text-sm text-slate-400 relative z-10">
-            Already have an account? 
+            Already have an account?
             <a href="login.html" class="text-teal-400 hover:text-teal-300 font-semibold transition-colors">Sign in</a>
         </div>
     </div>
 
     <script>
-        // Check if already logged in
         if (localStorage.getItem('auth_token')) {
             window.location.href = 'index.html';
         }
+
+        let usernameAvailable = null;
+        let checkTimeout = null;
+
+        const usernameInput = document.getElementById('username');
+        const usernameIcon = document.getElementById('usernameIcon');
+        const usernameHint = document.getElementById('usernameHint');
+        const confirmInput = document.getElementById('confirmPassword');
+        const confirmHint = document.getElementById('confirmHint');
+
+        // Real-time username availability check (debounced 500ms)
+        usernameInput.addEventListener('input', () => {
+            clearTimeout(checkTimeout);
+            const val = usernameInput.value.trim();
+            usernameAvailable = null;
+
+            usernameInput.classList.remove('is-taken', 'is-available');
+            usernameIcon.className = 'fas text-sm hidden';
+            usernameHint.textContent = 'At least 3 characters.';
+            usernameHint.className = 'text-xs mt-2 text-slate-500';
+
+            if (val.length < 3) return;
+
+            // Show spinner
+            usernameIcon.className = 'fas fa-spinner fa-spin text-slate-400 text-sm';
+
+            checkTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/auth/check?username=${encodeURIComponent(val)}`);
+                    const data = await res.json();
+
+                    if (data.exists) {
+                        usernameAvailable = false;
+                        usernameInput.classList.add('is-taken');
+                        usernameIcon.className = 'fas fa-times-circle text-red-400 text-sm';
+                        usernameHint.textContent = '✗ This username is already taken.';
+                        usernameHint.className = 'text-xs mt-2 text-red-400 font-medium';
+                    } else {
+                        usernameAvailable = true;
+                        usernameInput.classList.add('is-available');
+                        usernameIcon.className = 'fas fa-check-circle text-emerald-400 text-sm';
+                        usernameHint.textContent = '✓ Username is available!';
+                        usernameHint.className = 'text-xs mt-2 text-emerald-400 font-medium';
+                    }
+                } catch {
+                    usernameIcon.className = 'fas text-sm hidden';
+                    usernameHint.textContent = 'Could not verify username.';
+                    usernameHint.className = 'text-xs mt-2 text-slate-500';
+                }
+            }, 500);
+        });
+
+        // Real-time confirm password match
+        confirmInput.addEventListener('input', () => {
+            const pw = document.getElementById('password').value;
+            const conf = confirmInput.value;
+            if (!conf) { confirmHint.classList.add('hidden'); return; }
+            confirmHint.classList.remove('hidden');
+            if (pw === conf) {
+                confirmHint.textContent = '✓ Passwords match.';
+                confirmHint.className = 'text-xs mt-2 text-emerald-400 font-medium';
+            } else {
+                confirmHint.textContent = '✗ Passwords do not match.';
+                confirmHint.className = 'text-xs mt-2 text-red-400 font-medium';
+            }
+        });
 
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             const errorMsg = document.getElementById('errorMsg');
-            const username = document.getElementById('username').value.trim();
+            const username = usernameInput.value.trim();
             const password = document.getElementById('password').value;
+            const confirm = confirmInput.value;
+
+            // Client-side guards
+            if (usernameAvailable === false) {
+                errorMsg.textContent = 'This username is already taken. Please choose another.';
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            if (password !== confirm) {
+                errorMsg.textContent = 'Passwords do not match.';
+                errorMsg.classList.remove('hidden');
+                return;
+            }
 
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
             btn.disabled = true;
@@ -120,9 +236,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
-                
+
                 const data = await res.json();
-                
+
                 if (res.ok) {
                     localStorage.setItem('auth_token', data.token);
                     localStorage.setItem('username', data.username);
