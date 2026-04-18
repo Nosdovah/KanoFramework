@@ -416,7 +416,7 @@
                         <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border">
                             <label class="text-[10px] font-bold text-slate-500 uppercase">Filter Story:</label>
                             <select id="story-filter-hoq" onchange="onStoryFilterHoQChange()" class="text-xs p-1.5 border rounded bg-white outline-none font-bold text-blue-600 min-w-[150px]">
-                                <option value="ALL">Semua Story</option>
+                                <!-- Options will be populated by JS without 'Semua Story' -->
                             </select>
                         </div>
                     </div>
@@ -484,7 +484,7 @@
         let relations = [];
         let selectedStory = "ALL";
         let selectedStoryStep1 = "ALL";
-        let selectedStoryHoQ = "ALL";
+        let selectedStoryHoQ = ""; // Defaults to empty, will be set in loadData
 
         const relScores = { 'none': 0, 'strong': 9, 'medium': 3, 'weak': 1 };
         const technicalRequirements = [
@@ -523,6 +523,11 @@
                     } catch { relations.push(Array(technicalRequirements.length).fill('none')); }
                 });
                 updateStoryFilterOptions();
+                if (features.length > 0 && (!selectedStoryHoQ || selectedStoryHoQ === "ALL")) {
+                    selectedStoryHoQ = features[0].story;
+                    const hoqFilter = document.getElementById('story-filter-hoq');
+                    if (hoqFilter) hoqFilter.value = selectedStoryHoQ;
+                }
                 renderFeaturePairs(); renderKanoTesting(); renderHoQ();
                 window.drawKanoGraph();
             } catch (e) { console.error("Error loading data:", e); }
@@ -546,8 +551,11 @@
             }
             if (filterHoQ) {
                 const curH = filterHoQ.value;
-                filterHoQ.innerHTML = '<option value="ALL">Semua Story</option>' + 
-                    stories.map(s => `<option value="${s}" ${s === curH ? 'selected' : ''}>${s}</option>`).join('');
+                filterHoQ.innerHTML = stories.map(s => `<option value="${s}" ${s === curH ? 'selected' : ''}>${s}</option>`).join('');
+                if (!filterHoQ.value && stories.length > 0) {
+                    filterHoQ.value = stories[0];
+                    selectedStoryHoQ = stories[0];
+                }
             }
         }
 
