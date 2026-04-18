@@ -514,7 +514,7 @@
         }
 
         window.addFeaturePair = async function () {
-            if (isGuest) { alert("Silahkan login untuk menambahkan fitur."); return; }
+            if (isGuest) { window.location.href = 'login.html'; return; }
             const prob = document.getElementById('problem-input').value.trim();
             const sol  = document.getElementById('solution-input').value.trim();
             if (!prob || !sol) return;
