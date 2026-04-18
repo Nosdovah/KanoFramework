@@ -117,24 +117,24 @@
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between items-center h-16">
                 <!-- Left: Branding & Status -->
-                <div class="flex items-center gap-4 shrink-0">
+                <div class="flex items-center gap-2 sm:gap-4 shrink-0">
                     <div class="flex items-center gap-2">
                         <i class="fas fa-microchip text-blue-400 text-2xl"></i>
-                        <h1 class="text-lg font-extrabold tracking-tight">QFD <span class="text-blue-400">System</span></h1>
+                        <h1 class="text-lg font-extrabold tracking-tight">QFD <span class="text-blue-400 hidden sm:inline">System</span></h1>
                     </div>
                     
-                    <div id="guest-alert" class="hidden flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full text-amber-500 text-[10px] font-black uppercase tracking-widest">
+                    <div id="guest-alert" class="hidden flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-2 sm:px-3 py-1 rounded-full text-amber-500 text-[10px] font-black uppercase tracking-widest">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                         </span>
-                        Guest Mode
+                        <span class="hidden sm:inline">Guest Mode</span>
                     </div>
                 </div>
 
                 <!-- Right: Navigation & Auth -->
                 <div class="flex items-center gap-2 overflow-x-auto no-scrollbar ml-auto">
-                    <div class="flex items-center bg-slate-800/50 rounded-lg p-1 mr-2 no-scrollbar overflow-x-auto">
+                    <div class="flex items-center bg-slate-800/50 rounded-lg p-1 mr-0 sm:mr-2 no-scrollbar overflow-x-auto">
                         <button onclick="switchTab('studi-kasus')" id="btn-studi-kasus"
                             class="nav-btn px-4 py-1.5 rounded-md text-sm font-medium transition-all hover:bg-slate-700 whitespace-nowrap">
                             Dashboard
@@ -152,20 +152,20 @@
                     <div class="h-6 w-px bg-slate-700 mx-1 hidden md:block"></div>
 
                     <a href="materi.html"
-                        class="px-4 py-2 rounded-lg text-amber-400 hover:bg-amber-400/10 transition-all font-bold flex items-center gap-2 text-sm whitespace-nowrap">
+                        class="px-2 sm:px-4 py-2 rounded-lg text-amber-400 hover:bg-amber-400/10 transition-all font-bold flex items-center gap-2 text-sm whitespace-nowrap">
                         <i class="fas fa-book-open"></i> <span class="hidden lg:inline">Materi</span>
                     </a>
 
                     <div id="auth-buttons">
                         <button onclick="logout()"
-                            class="px-4 py-2 rounded-lg text-red-400 hover:bg-red-400/10 transition-all font-bold flex items-center gap-2 text-sm">
+                            class="px-2 sm:px-4 py-2 rounded-lg text-red-400 hover:bg-red-400/10 transition-all font-bold flex items-center gap-2 text-sm">
                             <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span>
                         </button>
                     </div>
                     
                     <div id="guest-buttons" class="hidden">
                         <a href="login.html"
-                            class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-all font-bold shadow-lg shadow-blue-500/20 text-sm">
+                            class="px-3 sm:px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-all font-bold shadow-lg shadow-blue-500/20 text-sm">
                             Login
                         </a>
                     </div>
