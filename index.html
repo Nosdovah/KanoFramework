@@ -928,10 +928,16 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating...';
             btn.disabled = true;
 
+            const listParent = listRoot.parentNode;
+            const listNext = listRoot.nextSibling;
+            const classParent = classRoot.parentNode;
+            const classNext = classRoot.nextSibling;
+            const wasClassHidden = classRoot.classList.contains('hidden');
+
             try {
                 // Create temporary container for export
                 const exportArea = document.createElement('div');
-                exportArea.className = "bg-white p-10 space-y-8";
+                exportArea.className = "bg-white p-10 space-y-10";
                 exportArea.style.width = "1100px";
                 exportArea.style.position = "fixed";
                 exportArea.style.left = "-9999px";
@@ -940,94 +946,73 @@
                 exportArea.innerHTML = `
                     <div class="border-b-4 border-blue-900 pb-4 mb-8">
                         <h1 class="text-3xl font-black text-blue-900">Kano Analysis Report</h1>
-                        <p class="text-slate-500 font-medium">Story: ${selectedStory}</p>
+                        <p class="text-slate-500 font-medium italic">Story Context: ${selectedStory}</p>
                     </div>
                     
-                    <div>
+                    <div id="export-sec-1">
                         <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                            <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm">1</span>
+                            <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-black">1</span>
                             Daftar Hasil Identifikasi
                         </h2>
-                        <div id="temp-list" class="space-y-4"></div>
                     </div>
 
-                    <div>
+                    <div id="export-sec-2">
                         <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                            <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm">2</span>
+                            <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-black">2</span>
                             Klasifikasi Kano & Pemetaan
                         </h2>
-                        <div id="temp-results"></div>
                     </div>
                 `;
 
                 document.body.appendChild(exportArea);
 
-                // Populate sections safely
-                const tempList = exportArea.querySelector('#temp-list');
-                const tempResults = exportArea.querySelector('#temp-results');
+                // MOVE REAL ELEMENTS into the export area (preserves canvas/state)
+                exportArea.querySelector('#export-sec-1').appendChild(listRoot);
+                exportArea.querySelector('#export-sec-2').appendChild(classRoot);
+                classRoot.classList.remove('hidden');
 
-                // Add features
-                features.filter(f => f.story === selectedStory).forEach(f => {
-                    const item = document.createElement('div');
-                    item.className = "p-4 border border-slate-200 rounded-xl bg-slate-50 grid grid-cols-2 gap-6";
-                    item.innerHTML = `
-                        <div>
-                            <span class="text-[9px] font-black text-red-500 uppercase tracking-widest">Masalah</span>
-                            <p class="text-xs font-bold text-slate-700 mt-1">${f.problem}</p>
-                        </div>
-                        <div>
-                            <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest">Solusi</span>
-                            <p class="text-xs font-bold text-slate-700 mt-1">${f.solution}</p>
-                        </div>
-                    `;
-                    tempList.appendChild(item);
-                });
-
-                // Add Classification Results
-                if (classRoot) {
-                    const clone = classRoot.cloneNode(true);
-                    clone.classList.remove('hidden');
-                    // Remove all UI buttons/dropdowns from the PDF
-                    clone.querySelectorAll('button, select, [data-html2canvas-ignore]').forEach(el => el.remove());
-                    tempResults.appendChild(clone);
-                }
-
-                // Capture
-                html2canvas(exportArea, { 
-                    scale: 1.2, 
-                    useCORS: true,
-                    backgroundColor: '#ffffff'
-                }).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF({
-                        orientation: 'landscape',
-                        unit: 'mm',
-                        format: 'a4'
+                // Small delay to ensure browser acknowledges the move
+                setTimeout(() => {
+                    html2canvas(exportArea, { 
+                        scale: 1.5, 
+                        useCORS: true,
+                        backgroundColor: '#ffffff'
+                    }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF({
+                            orientation: 'landscape',
+                            unit: 'mm',
+                            format: 'a4'
+                        });
+                        
+                        const pageWidth = pdf.internal.pageSize.getWidth();
+                        const pageHeight = pdf.internal.pageSize.getHeight();
+                        const margin = 10;
+                        const ratio = Math.min((pageWidth - (margin*2)) / canvas.width, (pageHeight - (margin*2)) / canvas.height);
+                        const finalWidth = canvas.width * ratio;
+                        const finalHeight = canvas.height * ratio;
+                        
+                        pdf.addImage(imgData, 'PNG', (pageWidth - finalWidth) / 2, (pageHeight - finalHeight) / 2, finalWidth, finalHeight);
+                        pdf.save(`Kano_Report_${selectedStory.replace(/\s+/g, '_')}.pdf`);
+                    }).catch(err => {
+                        console.error("PDF Error:", err);
+                        alert("PDF Error: " + err.message);
+                    }).finally(() => {
+                        // RESTORE ELEMENTS back to their original spots
+                        listParent.insertBefore(listRoot, listNext);
+                        classParent.insertBefore(classRoot, classNext);
+                        if (wasClassHidden) classRoot.classList.add('hidden');
+                        
+                        document.body.removeChild(exportArea);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
                     });
-                    
-                    const pageWidth = pdf.internal.pageSize.getWidth();
-                    const pageHeight = pdf.internal.pageSize.getHeight();
-                    const margin = 10;
-                    
-                    const ratio = Math.min((pageWidth - (margin*2)) / canvas.width, (pageHeight - (margin*2)) / canvas.height);
-                    const finalWidth = canvas.width * ratio;
-                    const finalHeight = canvas.height * ratio;
-                    
-                    pdf.addImage(imgData, 'PNG', (pageWidth - finalWidth) / 2, (pageHeight - finalHeight) / 2, finalWidth, finalHeight);
-                    pdf.save(`Kano_Report_${selectedStory.replace(/\s+/g, '_')}.pdf`);
-                }).catch(err => {
-                    console.error("Capture Error:", err);
-                    alert("Gagal mengambil gambar: " + err.message);
-                }).finally(() => {
-                    document.body.removeChild(exportArea);
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                });
+                }, 100);
 
             } catch (err) {
                 console.error("Global Error:", err);
-                alert("Kesalahan Sistem: " + err.message);
+                alert("Global Error: " + err.message);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
