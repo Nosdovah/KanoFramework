@@ -595,7 +595,12 @@
                 const url = new URL(`${API_URL}/items`, window.location.origin);
                 if (currentShareToken) url.searchParams.set('share_token', currentShareToken);
                 
-                const res = await fetch(url.toString());
+                const fetchOpts = {};
+                if (!currentShareToken && token) {
+                    fetchOpts.headers = { 'Authorization': `Bearer ${token}` };
+                }
+
+                const res = await fetch(url.toString(), fetchOpts);
                 const rows = await res.json();
                 features = []; kanoData = []; relations = [];
                 rows.forEach(r => {
@@ -707,9 +712,12 @@
                 const url = new URL(`${API_URL}/items`, window.location.origin);
                 if (currentShareToken) url.searchParams.set('share_token', currentShareToken);
 
+                const headers = { 'Content-Type': 'application/json' };
+                if (!currentShareToken && token) headers['Authorization'] = `Bearer ${token}`;
+
                 const res = await fetch(url.toString(), {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify({ problem: prob, solution: sol, story_context: story, relations: JSON.stringify(initialRelations) })
                 });
                 const data = await res.json();
@@ -730,7 +738,16 @@
             if (isGuest) { alert("Silahkan login untuk menghapus data."); return; }
             const dbId = features[index].dbId;
             try {
-                await fetch(`${API_URL}/items/${dbId}`, { method: 'DELETE' });
+                const url = new URL(`${API_URL}/items/${dbId}`, window.location.origin);
+                if (currentShareToken) url.searchParams.set('share_token', currentShareToken);
+                
+                const headers = {};
+                if (!currentShareToken && token) headers['Authorization'] = `Bearer ${token}`;
+
+                await fetch(url.toString(), { 
+                    method: 'DELETE',
+                    headers: headers
+                });
                 features.splice(index, 1); kanoData.splice(index, 1); relations.splice(index, 1);
                 updateStoryFilterOptions();
                 renderFeaturePairs(); renderKanoTesting(); renderHoQ();
@@ -837,9 +854,12 @@
                 const url = new URL(`${API_URL}/items/${features[idx].dbId}/kano`, window.location.origin);
                 if (currentShareToken) url.searchParams.set('share_token', currentShareToken);
 
+                const headers = { 'Content-Type': 'application/json' };
+                if (!currentShareToken && token) headers['Authorization'] = `Bearer ${token}`;
+
                 await fetch(url.toString(), {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify({ f: kanoData[idx].f, d: kanoData[idx].d, category: cat })
                 });
             } catch (e) { console.error("Failed to update kano:", e); }
@@ -932,9 +952,15 @@
             relations[fIdx][tIdx] = scoreKey;
             renderHoQ();
             try {
-                await fetch(`${API_URL}/items/${features[fIdx].dbId}/relations`, {
+                const url = new URL(`${API_URL}/items/${features[fIdx].dbId}/relations`, window.location.origin);
+                if (currentShareToken) url.searchParams.set('share_token', currentShareToken);
+
+                const headers = { 'Content-Type': 'application/json' };
+                if (!currentShareToken && token) headers['Authorization'] = `Bearer ${token}`;
+
+                await fetch(url.toString(), {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify({ relations: JSON.stringify(relations[fIdx]) })
                 });
             } catch (e) { console.error("Failed to update relations:", e); }
@@ -1197,15 +1223,19 @@
         }
 
         async function deleteAllData() {
-            if (isGuest) { alert("Silahkan login untuk menghapus data."); return; }
+            if (isGuest && !currentShareToken) { alert("Silahkan login untuk menghapus data."); return; }
             if (!confirm("⚠️ PERINGATAN KRITIS: Anda akan menghapus SELURUH data di database (Semua Story).\n\nTindakan ini tidak dapat dibatalkan. Apakah Anda yakin?")) {
                 return;
             }
 
             try {
-                const res = await fetch(`${API_URL}/items`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const url = new URL(`${API_URL}/items`, window.location.origin);
+                if (currentShareToken) url.searchParams.set('share_token', currentShareToken);
+
+                const headers = {};
+                if (!currentShareToken && token) headers['Authorization'] = `Bearer ${token}`;
+
+                const res = await fetch(url.toString(), { headers });
                 const allItems = await res.json();
                 
                 if (allItems.length === 0) {
@@ -1216,12 +1246,14 @@
                 const batchSize = 20;
                 for (let i = 0; i < allItems.length; i += batchSize) {
                     const batch = allItems.slice(i, i + batchSize);
-                    await Promise.all(batch.map(item => 
-                        fetch(`${API_URL}/items/${item.id}`, {
+                    await Promise.all(batch.map(item => {
+                        const delUrl = new URL(`${API_URL}/items/${item.id}`, window.location.origin);
+                        if (currentShareToken) delUrl.searchParams.set('share_token', currentShareToken);
+                        return fetch(delUrl.toString(), {
                             method: 'DELETE',
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        })
-                    ));
+                            headers: headers
+                        });
+                    }));
                 }
                 alert(`Berhasil menghapus TOTAL ${allItems.length} item.`);
                 await loadData();
@@ -1251,9 +1283,13 @@
                 btn.disabled = true;
 
                 // Find items to delete
-                const res = await fetch(`${API_URL}/items`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const url = new URL(`${API_URL}/items`, window.location.origin);
+                if (currentShareToken) url.searchParams.set('share_token', currentShareToken);
+
+                const headers = {};
+                if (!currentShareToken && token) headers['Authorization'] = `Bearer ${token}`;
+
+                const res = await fetch(url.toString(), { headers });
                 const allItems = await res.json();
                 
                 // Robust matching: Case-insensitive and handles "Default" vs empty strings
@@ -1272,7 +1308,7 @@
                 console.log(`📊 Found ${targets.length} items to delete.`);
 
                 if (targets.length === 0) {
-                    const uniqueStories = [...new Set(allItems.map(i => normalize(i.story)))];
+                    const uniqueStories = [...new Set(allItems.map(i => normalize(i.story_context)))];
                     console.log("📑 Stories available in DB:", uniqueStories);
                     alert("Tidak ada item ditemukan untuk story ini.");
                 } else {
@@ -1281,12 +1317,14 @@
                         const batch = targets.slice(i, i + batchSize);
                         btn.innerHTML = `<span class="text-[10px]">${i}/${targets.length}</span>`;
                         
-                        await Promise.all(batch.map(item => 
-                            fetch(`${API_URL}/items/${item.id}`, {
+                        await Promise.all(batch.map(item => {
+                            const delUrl = new URL(`${API_URL}/items/${item.id}`, window.location.origin);
+                            if (currentShareToken) delUrl.searchParams.set('share_token', currentShareToken);
+                            return fetch(delUrl.toString(), {
                                 method: 'DELETE',
-                                headers: { 'Authorization': `Bearer ${token}` }
-                            })
-                        ));
+                                headers: headers
+                            });
+                        }));
                     }
                     alert(`Berhasil menghapus ${targets.length} item untuk story "${storyName}".`);
                 }
@@ -1321,9 +1359,12 @@
 
         window.generateShareLink = async (permission) => {
             try {
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
                 const res = await fetch(`${API_URL}/share`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify({ permission })
                 });
                 const data = await res.json();
