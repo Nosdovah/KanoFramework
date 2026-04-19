@@ -926,15 +926,53 @@
                 alert("Selesaikan Klasifikasi Kano terlebih dahulu!");
                 return;
             }
-            const opt = {
-                margin: [10, 5, 10, 5],
-                filename: `Kano_Analysis_${selectedStory.replace(/\s+/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
-                pagebreak: { mode: 'avoid-all' }
-            };
-            html2pdf().from(element).set(opt).save();
+            
+            // Show loading state
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Capturing...';
+            btn.disabled = true;
+
+            const originalScrollY = window.scrollY;
+            window.scrollTo(0, 0);
+
+            html2canvas(element, { 
+                scale: 2, 
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: 0,
+                width: element.offsetWidth,
+                height: element.offsetHeight
+            }).then(canvas => {
+                window.scrollTo(0, originalScrollY);
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 10;
+                const maxWidth = pageWidth - (margin * 2);
+                const maxHeight = pageHeight - (margin * 2);
+                
+                const ratio = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
+                const finalWidth = canvas.width * ratio;
+                const finalHeight = canvas.height * ratio;
+                
+                pdf.addImage(imgData, 'PNG', (pageWidth - finalWidth) / 2, (pageHeight - finalHeight) / 2, finalWidth, finalHeight);
+                pdf.save(`Kano_Analysis_${selectedStory.replace(/\s+/g, '_')}.pdf`);
+            }).catch(err => {
+                console.error(err);
+                alert("Gagal mengunduh PDF: " + err.message);
+            }).finally(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
         }
 
         window.downloadHoQPDF = function() {
