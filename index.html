@@ -829,7 +829,7 @@
                     return sum + (imp * relScores[relations[fIdx][tIdx]]);
                 }, 0)
             );
-            const totalWeight = techWeights.reduce((sum, w) => sum + Math.abs(w), 0) || 1;
+            const totalWeight = techWeights.reduce((sum, w) => sum + Math.abs(w), 0);
             container.innerHTML = `
                 <div class="hoq-roof"></div>
                 <table class="hoq-table w-full text-[11px]">
