@@ -556,7 +556,13 @@
             "Tidak Suka":       { "Suka": "R", "Harus Ada": "R", "Netral": "R", "Dapat Ditoleransi": "R", "Tidak Suka": "Q" }
         };
 
-        let currentShareToken = new URLSearchParams(window.location.search).get('share_token');
+        // OBFUSCATION HELPERS
+        const obfuscate = (str) => btoa(str).replace(/=/g, '');
+        const deobfuscate = (str) => {
+            try { return atob(str); } catch { return str; }
+        };
+
+        let currentShareToken = deobfuscate(new URLSearchParams(window.location.search).get('s'));
         let currentRole = 'owner'; // 'owner', 'editor', 'commenter', 'viewer'
 
         async function initApp() {
@@ -584,7 +590,7 @@
                     document.body.classList.add('read-only-mode');
                 }
             } catch (err) {
-                alert(err.message);
+                // alert(err.message);
                 currentShareToken = null;
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
@@ -1369,7 +1375,8 @@
                 });
                 const data = await res.json();
                 if (data.token) {
-                    const shareUrl = `${window.location.origin}${window.location.pathname}?share_token=${data.token}`;
+                    const obfuscatedToken = obfuscate(data.token);
+                    const shareUrl = `${window.location.origin}${window.location.pathname}?s=${obfuscatedToken}`;
                     document.getElementById('share-url-input').value = shareUrl;
                     document.getElementById('share-link-result').classList.remove('hidden');
                 }
