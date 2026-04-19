@@ -569,19 +569,35 @@
         console.log("📍 Deobfuscated share token:", currentShareToken);
         let currentRole = 'owner'; // 'owner', 'editor', 'commenter', 'viewer'
 
+        // INSTANT UI SYNC
+        if (currentShareToken) {
+            document.body.classList.add('read-only-mode');
+            window.addEventListener('DOMContentLoaded', () => {
+                const statusAlert = document.getElementById('status-alert');
+                const statusText = document.getElementById('status-text');
+                if (statusAlert) {
+                    statusAlert.classList.remove('hidden');
+                    if (statusText) statusText.innerText = "Viewer Mode";
+                    statusAlert.classList.remove('text-amber-500', 'bg-amber-500/10', 'border-amber-500/20');
+                    statusAlert.classList.add('text-blue-400', 'bg-blue-500/10', 'border-blue-500/20');
+                }
+            });
+        }
+
         async function initApp() {
             console.log("🚀 Initializing QFD App...");
             try {
-                // Show Guest Mode by default if no token
-                if (!token && !currentShareToken) {
-                    const alertEl = document.getElementById('status-alert');
-                    if (alertEl) alertEl.classList.remove('hidden');
-                }
+                const statusAlert = document.getElementById('status-alert');
+                const statusText = document.getElementById('status-text');
 
                 if (currentShareToken) {
                     console.log("🔗 Share token detected, verifying...");
                     await verifyShareToken();
+                } else if (!token) {
+                    // Show Guest Mode only if NO token and NO share token
+                    if (statusAlert) statusAlert.classList.remove('hidden');
                 }
+
                 await loadData();
             } catch (e) {
                 console.error("❌ Fatal Error in initApp:", e);
@@ -608,10 +624,8 @@
                 if (statusAlert) {
                     statusAlert.classList.remove('hidden');
                     if (statusText) statusText.innerText = "Viewer Mode";
-                    // Robust color change
                     statusAlert.classList.remove('text-amber-500', 'bg-amber-500/10', 'border-amber-500/20');
                     statusAlert.classList.add('text-blue-400', 'bg-blue-500/10', 'border-blue-500/20');
-                    console.log("✅ UI Updated to Viewer Mode");
                 }
 
                 if (backBtn && token) {
