@@ -917,9 +917,13 @@
         }
 
         window.downloadKanoPDF = function() {
-            const element = document.getElementById('kano-module');
+            const element = document.getElementById('kano-classification-root');
+            if (!element || element.innerHTML.trim() === "") {
+                alert("Selesaikan Klasifikasi Kano terlebih dahulu!");
+                return;
+            }
             const opt = {
-                margin: 10,
+                margin: [10, 10, 10, 10],
                 filename: `Kano_Analysis_${selectedStory.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
@@ -929,9 +933,13 @@
         }
 
         window.downloadHoQPDF = function() {
-            const element = document.getElementById('hoq-module');
+            const element = document.getElementById('hoq-matrix-root');
+            if (!element || element.innerHTML.trim() === "") {
+                alert("Matriks HoQ belum siap!");
+                return;
+            }
             const opt = {
-                margin: 10,
+                margin: [10, 10, 10, 10],
                 filename: `House_of_Quality_${selectedStoryHoQ.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
