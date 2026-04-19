@@ -909,11 +909,7 @@
                             <i class="fas fa-check-circle"></i> Validasi: Total Prioritas HARUS 100% (Status: 100.0% Berhasil Direkalkulasi).
                         </div>`;
                     })()}
-                </div>
-            </div>`;
-        }
-
-        window.downloadKanoPDF = function() {
+                 window.downloadKanoPDF = function() {
             if (!features || features.length === 0) {
                 alert("Belum ada data untuk diekspor!");
                 return;
@@ -921,14 +917,27 @@
             
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating PDF...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Capturing...';
             btn.disabled = true;
 
-            // Robust Helper for Kano Category (Case-insensitive & Trimmed)
+            // Robust Helper for Kano Category (Fuzzy Matching)
             const getKanoCategory = (func, dys) => {
                 if (!func || !dys) return '-';
-                const f = func.trim().toLowerCase();
-                const d = dys.trim().toLowerCase();
+                const f = func.toString().trim().toLowerCase();
+                const d = dys.toString().trim().toLowerCase();
+                
+                // Map common variations to standard keys
+                const mapKey = (val) => {
+                    if (val.includes('suka') && !val.includes('tidak')) return 'suka';
+                    if (val.includes('harus ada')) return 'harus ada';
+                    if (val.includes('netral')) return 'netral';
+                    if (val.includes('tidak suka') && !val.includes('sangat')) return 'tidak suka';
+                    if (val.includes('sangat tidak suka')) return 'sangat tidak suka';
+                    return val;
+                };
+
+                const fk = mapKey(f);
+                const dk = mapKey(d);
                 
                 const matrix = {
                     'suka': { 'suka': 'Q', 'harus ada': 'A', 'netral': 'A', 'tidak suka': 'A', 'sangat tidak suka': 'O' },
@@ -938,56 +947,54 @@
                     'sangat tidak suka': { 'suka': 'R', 'harus ada': 'R', 'netral': 'R', 'tidak suka': 'R', 'sangat tidak suka': 'Q' }
                 };
                 
-                return matrix[f]?.[d] || 'I';
+                return matrix[fk]?.[dk] || 'I';
             };
 
             try {
                 const exportArea = document.createElement('div');
                 exportArea.className = "bg-white p-12";
-                exportArea.style.width = "1000px";
+                // Narrower width (800px) means fonts will look LARGER when scaled to A4 Landscape (approx 1100px)
+                exportArea.style.width = "850px"; 
                 exportArea.style.position = "fixed";
                 exportArea.style.left = "-9999px";
                 exportArea.style.top = "0";
                 
-                // Get Map Canvas - Try multiple possible selectors
+                // Get Map Canvas
                 const kanoCanvas = document.querySelector('#kanoMap canvas') || document.querySelector('.chartjs-render-monitor') || document.querySelector('canvas');
                 const chartImg = kanoCanvas ? kanoCanvas.toDataURL('image/png', 1.0) : null;
 
                 exportArea.innerHTML = `
-                    <div style="border-bottom: 4px solid #1e3a8a; padding-bottom: 20px; margin-bottom: 40px; text-align: center;">
-                        <h1 style="font-size: 28px; font-weight: 900; color: #1e3a8a; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Kano Analysis Report</h1>
-                        <p style="color: #64748b; font-size: 16px; margin: 10px 0 0 0; font-weight: 500;">Project Story: <span style="color: #334155;">${selectedStory}</span></p>
+                    <div style="border-bottom: 5px solid #1e40af; padding-bottom: 20px; margin-bottom: 40px; text-align: center;">
+                        <h1 style="font-size: 32px; font-weight: 900; color: #1e40af; margin: 0; text-transform: uppercase;">Kano Analysis Report</h1>
+                        <p style="color: #475569; font-size: 18px; margin: 10px 0 0 0; font-weight: 600;">Story: ${selectedStory}</p>
                     </div>
 
                     <div style="margin-bottom: 50px;">
-                        <h2 style="font-size: 20px; font-weight: 800; color: #1e40af; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                            <span style="background: #1e40af; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">1</span>
-                            Klasifikasi Kebutuhan (Kano Category)
-                        </h2>
-                        <table style="width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; font-size: 13px;">
+                        <h2 style="font-size: 24px; font-weight: 800; color: #1e40af; margin-bottom: 25px; border-left: 8px solid #1e40af; padding-left: 15px;">1. Klasifikasi Kebutuhan</h2>
+                        <table style="width: 100%; border-collapse: collapse; border: 2px solid #e2e8f0; font-size: 15px;">
                             <thead>
-                                <tr style="background: #f8fafc;">
-                                    <th style="border-bottom: 2px solid #e2e8f0; padding: 15px; text-align: left; color: #475569; font-weight: 700; width: 85%;">Masalah & Fitur Solusi</th>
-                                    <th style="border-bottom: 2px solid #e2e8f0; padding: 15px; text-align: center; color: #475569; font-weight: 700;">Category</th>
+                                <tr style="background: #f1f5f9;">
+                                    <th style="border: 2px solid #e2e8f0; padding: 18px; text-align: left; font-weight: 900; width: 80%;">Masalah & Fitur Solusi</th>
+                                    <th style="border: 2px solid #e2e8f0; padding: 18px; text-align: center; font-weight: 900;">Kano</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${features.filter(f => f.story === selectedStory).map((f, idx) => `
-                                    <tr style="${idx % 2 === 0 ? 'background: #ffffff;' : 'background: #fbfcfd;'}">
-                                        <td style="border-bottom: 1px solid #f1f5f9; padding: 15px;">
-                                            <div style="margin-bottom: 10px;">
-                                                <span style="color: #ef4444; font-weight: 800; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 2px;">Masalah (VoC)</span>
-                                                <div style="color: #334155; font-weight: 600; line-height: 1.4;">${f.problem}</div>
+                                    <tr>
+                                        <td style="border: 2px solid #e2e8f0; padding: 20px;">
+                                            <div style="margin-bottom: 12px;">
+                                                <strong style="color: #ef4444; font-size: 11px; text-transform: uppercase; display: block;">MASALAH:</strong>
+                                                <div style="font-weight: 700; color: #1e293b; line-height: 1.5; font-size: 14px;">${f.problem}</div>
                                             </div>
                                             <div>
-                                                <span style="color: #3b82f6; font-weight: 800; font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 2px;">Solusi (Product Feature)</span>
-                                                <div style="color: #334155; font-weight: 600; line-height: 1.4;">${f.solution}</div>
+                                                <strong style="color: #2563eb; font-size: 11px; text-transform: uppercase; display: block;">SOLUSI:</strong>
+                                                <div style="font-weight: 700; color: #1e293b; line-height: 1.5; font-size: 14px;">${f.solution}</div>
                                             </div>
                                         </td>
-                                        <td style="border-bottom: 1px solid #f1f5f9; padding: 15px; text-align: center;">
-                                            <span style="background: #eff6ff; color: #1e40af; font-size: 22px; font-weight: 900; padding: 8px 15px; border-radius: 8px; border: 1px solid #bfdbfe;">
+                                        <td style="border: 2px solid #e2e8f0; padding: 20px; text-align: center;">
+                                            <div style="background: #1e40af; color: white; width: 45px; height: 45px; line-height: 45px; border-radius: 8px; font-size: 26px; font-weight: 900; margin: 0 auto;">
                                                 ${getKanoCategory(f.functional, f.dysfunctional)}
-                                            </span>
+                                            </div>
                                         </td>
                                     </tr>
                                 `).join('')}
@@ -995,14 +1002,10 @@
                         </table>
                     </div>
 
-                    <div>
-                        <h2 style="font-size: 20px; font-weight: 800; color: #1e40af; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                            <span style="background: #1e40af; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">2</span>
-                            Kano Perceptual Map Visualization
-                        </h2>
-                        <div style="text-align: center; background: #ffffff; padding: 30px; border-radius: 20px; border: 2px dashed #e2e8f0; min-height: 300px; display: flex; align-items: center; justify-content: center;">
-                            ${chartImg ? `<img src="${chartImg}" style="max-width: 100%; height: auto; max-height: 450px;" />` : 
-                            '<div style="color: #94a3b8; font-style: italic;">Visualisasi Map tidak dapat dimuat. Pastikan Map muncul di layar sebelum mengunduh.</div>'}
+                    <div style="page-break-before: always; padding-top: 20px;">
+                        <h2 style="font-size: 24px; font-weight: 800; color: #1e40af; margin-bottom: 25px; border-left: 8px solid #1e40af; padding-left: 15px;">2. Kano Perceptual Map</h2>
+                        <div style="text-align: center; background: #ffffff; padding: 40px; border: 3px solid #f1f5f9; border-radius: 20px;">
+                            ${chartImg ? `<img src="${chartImg}" style="width: 100%; height: auto; max-height: 500px;" />` : '<p>Map tidak tersedia</p>'}
                         </div>
                     </div>
                 `;
@@ -1011,7 +1014,7 @@
 
                 setTimeout(() => {
                     html2canvas(exportArea, { 
-                        scale: 2, 
+                        scale: 3, // Very high scale for crisp text
                         useCORS: true,
                         backgroundColor: '#ffffff'
                     }).then(canvas => {
@@ -1026,20 +1029,20 @@
                         const finalHeight = canvas.height * ratio;
                         
                         pdf.addImage(imgData, 'PNG', (pageWidth - finalWidth) / 2, (pageHeight - finalHeight) / 2, finalWidth, finalHeight);
-                        pdf.save(`Kano_Report_${selectedStory.replace(/\s+/g, '_')}.pdf`);
-                    }).catch(err => {
-                        alert("Gagal memproses gambar: " + err.message);
+                        pdf.save(`Kano_Thesis_Report_${selectedStory.replace(/\s+/g, '_')}.pdf`);
                     }).finally(() => {
                         document.body.removeChild(exportArea);
                         btn.innerHTML = originalText;
                         btn.disabled = false;
                     });
-                }, 200);
+                }, 300);
 
             } catch (err) {
-                alert("Kesalahan Export: " + err.message);
+                alert("Kesalahan: " + err.message);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
+            }
+        }   btn.disabled = false;
             }
         }
 
