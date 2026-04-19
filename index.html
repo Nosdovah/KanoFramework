@@ -869,10 +869,21 @@
                         </tr>
                         <tr class="bg-white font-bold">
                             <td colspan="2" class="text-right px-4 uppercase text-slate-400">Prioritas (%)</td>
-                            ${techWeights.map(w => {
-                                const val = (w / totalWeight) * 100;
-                                return `<td class="${w < 0 ? 'text-red-500' : ''}">${val.toFixed(1)}%</td>`;
-                            }).join('')}
+                            ${(() => {
+                                const rounded = techWeights.map(w => parseFloat(((w / totalWeight) * 100).toFixed(1)));
+                                const currentSum = rounded.reduce((a, b) => a + b, 0);
+                                
+                                if (currentSum !== 100 && totalWeight > 0) {
+                                    const diff = 100 - currentSum;
+                                    // Apply difference to the highest weight element to minimize relative error
+                                    const maxIdx = techWeights.indexOf(Math.max(...techWeights));
+                                    rounded[maxIdx] = parseFloat((rounded[maxIdx] + diff).toFixed(1));
+                                }
+                                
+                                return rounded.map((p, i) => 
+                                    `<td class="${techWeights[i] < 0 ? 'text-red-500' : ''}">${p.toFixed(1)}%</td>`
+                                ).join('');
+                            })()}
                         </tr>
                     </tfoot>
                 </table>`;
