@@ -906,10 +906,13 @@
                             </div>`;
                         }
                         return `<div class="bg-green-50 text-green-700 p-3 rounded-lg border border-green-200 text-xs font-bold flex items-center gap-2">
-                            <i class="fas fa-check-circle"></i> Validasi: Total Prioritas HARUS 100% (Status: 100.0% Berhasil Direkalkulasi).
                         </div>`;
                     })()}
-                 window.downloadKanoPDF = function() {
+                </div>
+            </div>`;
+        }
+
+        window.downloadKanoPDF = function() {
             if (!features || features.length === 0) {
                 alert("Belum ada data untuk diekspor!");
                 return;
