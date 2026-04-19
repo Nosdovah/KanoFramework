@@ -413,7 +413,7 @@
                             <i class="fas fa-home mr-3 text-blue-800"></i> House of Quality Matrix
                         </h2>
                         <div class="flex items-center gap-2">
-                            <button onclick="downloadHoQPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-md mr-2">
+                            <button onclick="downloadHoQPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-md mr-2" data-html2canvas-ignore="true">
                                 <i class="fas fa-file-pdf mr-2"></i> Download PDF
                             </button>
                             <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border shadow-sm">
@@ -921,9 +921,9 @@
         }
 
         window.downloadKanoPDF = function() {
-            const element = document.getElementById('kano-classification-root');
-            if (!element || element.innerHTML.trim() === "") {
-                alert("Selesaikan Klasifikasi Kano terlebih dahulu!");
+            const element = document.getElementById('kano-module');
+            if (!element) {
+                alert("Modul Kano tidak ditemukan!");
                 return;
             }
             
