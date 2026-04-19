@@ -1136,10 +1136,21 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const allItems = await res.json();
-                const targets = allItems.filter(i => i.story && i.story.trim() === storyName.trim());
+                
+                // Robust matching: Case-insensitive and strips all weird whitespace
+                const normalize = (s) => s ? s.toLowerCase().replace(/\s+/g, ' ').trim() : '';
+                const targetNorm = normalize(storyName);
+                
+                const targets = allItems.filter(i => normalize(i.story) === targetNorm);
+
+                console.log(`🔍 Debug: Target story "${targetNorm}"`);
+                console.log(`📊 Found ${targets.length} matches out of ${allItems.length} total items.`);
 
                 if (targets.length === 0) {
-                    alert("Tidak ada item ditemukan untuk story ini.");
+                    // Log unique stories found in DB to help debug
+                    const uniqueStories = [...new Set(allItems.map(i => normalize(i.story)))];
+                    console.log("📑 Stories available in DB:", uniqueStories);
+                    alert("Tidak ada item ditemukan untuk story ini. Cek console (F12) untuk detail.");
                 } else {
                     for (const item of targets) {
                         await fetch(`${API_URL}/items/${item.id}`, {
