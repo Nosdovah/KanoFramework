@@ -1153,16 +1153,21 @@
                 console.log(`📊 Found ${targets.length} items to delete.`);
 
                 if (targets.length === 0) {
-                    // Log unique stories found in DB to help debug
                     const uniqueStories = [...new Set(allItems.map(i => normalize(i.story)))];
                     console.log("📑 Stories available in DB:", uniqueStories);
-                    alert("Tidak ada item ditemukan untuk story ini. Cek console (F12) untuk detail.");
+                    alert("Tidak ada item ditemukan untuk story ini.");
                 } else {
-                    for (const item of targets) {
-                        await fetch(`${API_URL}/items/${item.id}`, {
-                            method: 'DELETE',
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
+                    const batchSize = 20; // Delete 20 at a time for speed
+                    for (let i = 0; i < targets.length; i += batchSize) {
+                        const batch = targets.slice(i, i + batchSize);
+                        btn.innerHTML = `<span class="text-[10px]">${i}/${targets.length}</span>`;
+                        
+                        await Promise.all(batch.map(item => 
+                            fetch(`${API_URL}/items/${item.id}`, {
+                                method: 'DELETE',
+                                headers: { 'Authorization': `Bearer ${token}` }
+                            })
+                        ));
                     }
                     alert(`Berhasil menghapus ${targets.length} item untuk story "${storyName}".`);
                 }
