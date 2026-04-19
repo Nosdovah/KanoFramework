@@ -988,6 +988,13 @@
                         <tbody>
                             ${data.map((f, i) => {
                                 const cat = kanoData[features.indexOf(f)]?.category || '-';
+                                
+                                // COLOR MAPPING BASED ON CATEGORY
+                                let bgColor = '#94a3b8'; // Default Grey (I, R, -)
+                                if (cat === 'A') bgColor = '#10b981'; // Green
+                                if (cat === 'M') bgColor = '#ef4444'; // Red
+                                if (cat === 'O') bgColor = '#2563eb'; // Blue
+                                
                                 return `
                                 <tr>
                                     <td style="border: 3px solid #cbd5e1; padding: 28px;">
@@ -1001,7 +1008,7 @@
                                         </div>
                                     </td>
                                     <td style="border: 3px solid #cbd5e1; padding: 28px; text-align: center; vertical-align: middle;">
-                                        <div style="background: #1e40af; color: white; width: 65px; height: 65px; line-height: 65px; border-radius: 14px; font-size: 34px; font-weight: 900; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);">
+                                        <div style="background: ${bgColor}; color: white; width: 65px; height: 65px; line-height: 65px; border-radius: 14px; font-size: 34px; font-weight: 900; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);">
                                             ${cat}
                                         </div>
                                     </td>
