@@ -939,16 +939,41 @@
             const element = document.getElementById('hoq-export-wrapper');
             if (!element) return;
             
-            const opt = {
-                margin: [5, 2, 5, 2],
-                filename: `House_of_Quality_${selectedStoryHoQ.replace(/\s+/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 1.0 },
-                html2canvas: { scale: 1.2, useCORS: true, logging: false },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
-                pagebreak: { mode: 'avoid-all' }
-            };
-
-            html2pdf().from(element).set(opt).save();
+            // Manual capture to guarantee single-page placement
+            html2canvas(element, { 
+                scale: 2, 
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                logging: false
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jspdf.jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 5;
+                
+                const maxWidth = pageWidth - (margin * 2);
+                const maxHeight = pageHeight - (margin * 2);
+                
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+                const ratio = Math.min(maxWidth / imgWidth, maxHeight / imgHeight);
+                
+                const finalWidth = imgWidth * ratio;
+                const finalHeight = imgHeight * ratio;
+                
+                // Center it
+                const x = (pageWidth - finalWidth) / 2;
+                const y = (pageHeight - finalHeight) / 2;
+                
+                pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
+                pdf.save(`House_of_Quality_${selectedStoryHoQ.replace(/\s+/g, '_')}.pdf`);
+            });
         }
 
         window.addEventListener('load', initApp);
