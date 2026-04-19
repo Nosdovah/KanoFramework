@@ -835,7 +835,7 @@
             );
             const totalWeight = techWeights.reduce((sum, w) => sum + Math.abs(w), 0);
             container.innerHTML = `
-                <div id="hoq-export-wrapper" class="bg-white p-4" style="page-break-inside: avoid; width: 1100px; margin: 0 auto;">
+                <div id="hoq-export-wrapper" class="bg-white p-8 inline-block min-w-full" style="page-break-inside: avoid;">
                     <div class="hoq-roof"></div>
                     <table class="hoq-table w-full text-[11px] border-collapse table-fixed">
                     <thead>
@@ -947,14 +947,22 @@
             // Show loading state
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Capturing...';
             btn.disabled = true;
+
+            const originalScrollY = window.scrollY;
+            window.scrollTo(0, 0);
 
             html2canvas(element, { 
                 scale: 2, 
                 useCORS: true,
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: 0,
+                width: element.offsetWidth,
+                height: element.offsetHeight
             }).then(canvas => {
+                window.scrollTo(0, originalScrollY);
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
