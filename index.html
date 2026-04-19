@@ -312,34 +312,27 @@
                     </div>
 
                     <!-- Form Input Masalah & Solusi -->
-                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Story Context / Title</label>
-                                <input type="text" id="story-input"
-                                    placeholder="Contoh: Pengembangan Aplikasi Community Platform v1..."
-                                    class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-                            </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8" data-html2canvas-ignore="true">
+                        <div class="grid grid-cols-1 gap-4">
                             <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Masalah (Voice of
-                                    Customer)</label>
-                                <textarea id="problem-input"
-                                    placeholder="Contoh: Baterai laptop habis karena minim colokan..."
-                                    class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none h-20 text-sm"></textarea>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Story Context / Title</label>
+                                <input type="text" id="story-input" placeholder="Contoh: Pengembangan Aplikasi Community Platform v1..." class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-500 mb-1 uppercase">Fitur Solusi
-                                    (Product Feature)</label>
-                                <textarea id="solution-input"
-                                    placeholder="Contoh: Penambahan power socket di setiap meja..."
-                                    class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none h-20 text-sm"></textarea>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Masalah (Voice of Customer)</label>
+                                    <textarea id="problem-input" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-24"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fitur Solusi (Product Feature)</label>
+                                    <textarea id="solution-input" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none h-24"></textarea>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mt-4 flex justify-end">
-                            <button onclick="addFeaturePair()"
-                                class="bg-slate-800 text-white px-6 py-2 rounded-md hover:bg-slate-700 text-sm font-bold">
-                                <i class="fas fa-plus mr-2"></i> Tambahkan ke Daftar
-                            </button>
+                            <div class="flex justify-end">
+                                <button onclick="addFeaturePair()" class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center gap-2">
+                                    <i class="fas fa-plus"></i> Tambahkan ke Daftar
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -354,7 +347,7 @@
                         <!-- Data Masalah & Solusi akan muncul di sini -->
                     </div>
 
-                    <div class="mt-8 pt-4 border-t flex justify-end">
+                    <div class="mt-8 pt-4 border-t flex justify-end" data-html2canvas-ignore="true">
                         <button onclick="goToKanoStep(2)"
                             class="bg-blue-600 text-white px-6 py-2 rounded-md font-bold">Lanjut Evaluasi Kano
                             &rarr;</button>
@@ -395,7 +388,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-8 pt-4 border-t flex justify-end">
+                    <div class="mt-8 pt-4 border-t flex justify-end" data-html2canvas-ignore="true">
                         <button onclick="switchTab('hoq-module')"
                             class="bg-blue-600 text-white px-6 py-2 rounded-md font-bold">Bangun House of Quality
                             &rarr;</button>
@@ -665,7 +658,7 @@
                     <div class="flex items-center justify-between border-b pb-1 mb-1">
                         <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-0.5 rounded uppercase tracking-wider">Story: ${f.story}</span>
                         ${!isGuest ? `
-                        <button onclick="deleteFeaturePair(${f.originalIndex})" class="text-slate-300 hover:text-red-500 p-1">
+                        <button onclick="deleteFeaturePair(${f.originalIndex})" class="text-slate-300 hover:text-red-500 p-1" data-html2canvas-ignore="true">
                             <i class="fas fa-trash text-xs"></i>
                         </button>` : ''}
                     </div>
@@ -921,31 +914,79 @@
         }
 
         window.downloadKanoPDF = function() {
-            const element = document.getElementById('kano-module');
-            if (!element) {
-                alert("Modul Kano tidak ditemukan!");
+            const listRoot = document.getElementById('feature-list-root');
+            const classRoot = document.getElementById('kano-classification-root');
+            
+            if (!features || features.length === 0) {
+                alert("Belum ada data untuk diekspor!");
                 return;
             }
             
             // Show loading state
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Capturing...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating Report...';
             btn.disabled = true;
 
-            const originalScrollY = window.scrollY;
-            window.scrollTo(0, 0);
+            // Create temporary hidden container for unified report
+            const exportArea = document.createElement('div');
+            exportArea.className = "bg-white p-10 space-y-8";
+            exportArea.style.width = "1200px";
+            exportArea.style.position = "absolute";
+            exportArea.style.left = "-9999px";
+            
+            exportArea.innerHTML = `
+                <div class="border-b-2 border-slate-800 pb-4 mb-8">
+                    <h1 class="text-2xl font-bold text-slate-800">Kano Analysis Report</h1>
+                    <p class="text-slate-500 text-sm">Generated for Story: ${selectedStory}</p>
+                </div>
+                
+                <section>
+                    <h2 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i class="fas fa-list-check text-blue-600"></i> Daftar Hasil Identifikasi
+                    </h2>
+                    <div class="grid grid-cols-1 gap-3">
+                        ${features.filter(f => f.story === selectedStory).map(f => `
+                            <div class="p-4 border rounded-lg bg-slate-50">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <span class="block text-[9px] font-black text-red-600 uppercase">Masalah:</span>
+                                        <p class="text-xs text-slate-700 font-bold">${f.problem}</p>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[9px] font-black text-blue-600 uppercase">Solusi:</span>
+                                        <p class="text-xs text-slate-700 font-bold">${f.solution}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </section>
 
-            html2canvas(element, { 
-                scale: 2, 
+                <section>
+                    <h2 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i class="fas fa-chart-line text-blue-600"></i> Klasifikasi Kano & Pemetaan
+                    </h2>
+                    <div id="temp-kano-results"></div>
+                </section>
+            `;
+
+            document.body.appendChild(exportArea);
+
+            // Clone the classification results if they exist
+            if (classRoot && classRoot.innerHTML.trim() !== "") {
+                const resultsClone = classRoot.cloneNode(true);
+                resultsClone.classList.remove('hidden');
+                // Remove buttons from clone
+                resultsClone.querySelectorAll('[data-html2canvas-ignore]').forEach(el => el.remove());
+                exportArea.querySelector('#temp-kano-results').appendChild(resultsClone);
+            }
+
+            html2canvas(exportArea, { 
+                scale: 1.5, 
                 useCORS: true,
-                backgroundColor: '#ffffff',
-                scrollX: 0,
-                scrollY: 0,
-                width: element.offsetWidth,
-                height: element.offsetHeight
+                backgroundColor: '#ffffff'
             }).then(canvas => {
-                window.scrollTo(0, originalScrollY);
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
@@ -957,19 +998,15 @@
                 const pageWidth = pdf.internal.pageSize.getWidth();
                 const pageHeight = pdf.internal.pageSize.getHeight();
                 const margin = 10;
-                const maxWidth = pageWidth - (margin * 2);
-                const maxHeight = pageHeight - (margin * 2);
                 
-                const ratio = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
+                const ratio = Math.min((pageWidth - 20) / canvas.width, (pageHeight - 20) / canvas.height);
                 const finalWidth = canvas.width * ratio;
                 const finalHeight = canvas.height * ratio;
                 
                 pdf.addImage(imgData, 'PNG', (pageWidth - finalWidth) / 2, (pageHeight - finalHeight) / 2, finalWidth, finalHeight);
-                pdf.save(`Kano_Analysis_${selectedStory.replace(/\s+/g, '_')}.pdf`);
-            }).catch(err => {
-                console.error(err);
-                alert("Gagal mengunduh PDF: " + err.message);
+                pdf.save(`Kano_Report_${selectedStory.replace(/\s+/g, '_')}.pdf`);
             }).finally(() => {
+                document.body.removeChild(exportArea);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             });
