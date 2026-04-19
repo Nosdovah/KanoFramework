@@ -30,21 +30,10 @@
             width: 0;
             height: 0;
             border-style: solid;
-            border-width: 0 150px 100px 150px;
+            border-width: 0 500px 150px 500px;
             border-color: transparent transparent #e2e8f0 transparent;
             margin: 0 auto -2px auto;
             position: relative;
-        }
-
-        /* Diagonal labels for Technical Requirements */
-        .vertical-text {
-            display: block;
-            white-space: nowrap;
-            transform: rotate(-90deg);
-            transform-origin: center;
-            width: 100%;
-            text-align: left;
-            padding-left: 10px;
         }
 
         .kano-label-A {
@@ -845,13 +834,13 @@
             const totalWeight = techWeights.reduce((sum, w) => sum + Math.abs(w), 0);
             container.innerHTML = `
                 <div class="hoq-roof"></div>
-                <table class="hoq-table w-full text-[11px]">
+                <table class="hoq-table w-full text-[11px] border-collapse">
                     <thead>
                         <tr class="bg-slate-100">
-                            <th class="row-header w-48">MASALAH &amp; FITUR &rarr;</th>
-                            <th class="w-12 bg-slate-200">Kano</th>
-                            ${technicalRequirements.map(tr => `<th class="h-32 p-0 w-12"><div class="vertical-text mx-auto font-bold text-slate-600">${tr}</div></th>`).join('')}
-                            <th class="w-16 bg-slate-100 font-black text-blue-900 border-l-2 border-slate-300">SUM</th>
+                            <th class="row-header min-w-[400px] p-4 text-left border">MASALAH &amp; FITUR &rarr;</th>
+                            <th class="w-12 bg-slate-200 border">Kano</th>
+                            ${technicalRequirements.map(tr => `<th class="p-4 border bg-slate-50 font-bold text-slate-600 text-center min-w-[150px] whitespace-normal">${tr}</th>`).join('')}
+                            <th class="w-20 bg-slate-100 font-black text-blue-900 border-l-2 border-slate-300 border-y border-r">SUM</th>
                         </tr>
                     </thead>
                     <tbody>
