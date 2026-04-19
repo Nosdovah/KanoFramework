@@ -506,6 +506,7 @@
         const isGuest = !token;
 
         if (isGuest) {
+            document.body.classList.add('read-only-mode');
             const statusAlert = document.getElementById('status-alert');
             if (statusAlert) statusAlert.classList.remove('hidden');
             
