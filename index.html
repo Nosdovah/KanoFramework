@@ -388,6 +388,10 @@
                             </div>
                         </div>
                     </div>
+                    <div class="mt-12" id="kano-classification-root">
+                        <!-- Summary table will appear here -->
+                    </div>
+
                     <div class="mt-8 pt-4 border-t flex justify-end" data-html2canvas-ignore="true">
                         <button onclick="switchTab('hoq-module')"
                             class="bg-blue-600 text-white px-6 py-2 rounded-md font-bold">Bangun House of Quality
@@ -525,7 +529,10 @@
                     const hoqFilter = document.getElementById('story-filter-hoq');
                     if (hoqFilter) hoqFilter.value = selectedStoryHoQ;
                 }
-                renderFeaturePairs(); renderKanoTesting(); renderHoQ();
+                renderFeaturePairs(); 
+                renderKanoTesting(); 
+                renderKanoClassification();
+                renderHoQ();
                 window.drawKanoGraph();
             } catch (e) { console.error("Error loading data:", e); }
         }
@@ -569,6 +576,7 @@
         window.onStoryFilterChange = function() {
             selectedStory = document.getElementById('story-filter').value;
             renderKanoTesting();
+            renderKanoClassification();
             renderHoQ();
             window.drawKanoGraph();
         }
@@ -582,7 +590,7 @@
         window.goToKanoStep = function (n) {
             document.querySelectorAll('.kano-step').forEach(s => s.classList.remove('active'));
             document.getElementById(`kano-step-${n}`).classList.add('active');
-            if (n === 2) { renderKanoTesting(); setTimeout(window.drawKanoGraph, 100); }
+            if (n === 2) { renderKanoTesting(); renderKanoClassification(); setTimeout(window.drawKanoGraph, 100); }
         }
 
         window.addFeaturePair = async function () {
@@ -795,6 +803,49 @@
             });
         }
 
+        function renderKanoClassification() {
+            const root = document.getElementById('kano-classification-root');
+            if (!root) return;
+            const data = features.filter(f => f.story === selectedStory);
+            
+            root.innerHTML = `
+                <div class="flex justify-between items-center mb-6" data-html2canvas-ignore="true">
+                    <h3 class="text-xl font-bold text-slate-800">Daftar Hasil Klasifikasi Kano</h3>
+                    <div class="flex gap-2">
+                        <button onclick="downloadKanoPDF(event)" class="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition flex items-center gap-2 text-sm font-bold shadow-lg">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto bg-white rounded-xl border border-slate-200 shadow-sm p-1">
+                    <table class="w-full text-sm text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b-2 border-slate-200">
+                                <th class="p-4 font-black text-slate-700 uppercase tracking-wider w-[40%]">Masalah</th>
+                                <th class="p-4 font-black text-slate-700 uppercase tracking-wider w-[40%]">Fitur Solusi</th>
+                                <th class="p-4 font-black text-slate-700 uppercase tracking-wider text-center">Kano</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            ${data.map((f, i) => {
+                                const cat = kanoData[features.indexOf(f)]?.category || '-';
+                                return `
+                                <tr class="hover:bg-slate-50/50 transition">
+                                    <td class="p-4 text-slate-600 font-medium leading-relaxed">${f.problem}</td>
+                                    <td class="p-4 text-blue-700 font-bold leading-relaxed">${f.solution}</td>
+                                    <td class="p-4 text-center">
+                                        <span class="inline-block w-10 h-10 leading-10 rounded-lg bg-blue-900 text-white font-black text-lg shadow-sm">
+                                            ${cat}
+                                        </span>
+                                    </td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
         window.setRelation = async function (fIdx, tIdx, scoreKey) {
             if (isGuest) return;
             relations[fIdx][tIdx] = scoreKey;
@@ -914,9 +965,9 @@
         }
 
         window.downloadKanoPDF = function() {
-            // SYNC DIRECTLY WITH THE GLOBAL kanoData ARRAY
-            if (!features || !kanoData || features.length === 0) {
-                alert("Data belum tersedia. Selesaikan evaluasi Kano terlebih dahulu!");
+            const element = document.getElementById('kano-classification-root');
+            if (!element) {
+                alert("Klasifikasi belum dibuat.");
                 return;
             }
             
@@ -925,93 +976,49 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Capturing...';
             btn.disabled = true;
 
-            try {
-                // Filter data by current story
-                const reportData = features.map((f, i) => ({
-                    ...f,
-                    category: kanoData[i]?.category || '-'
-                })).filter(f => f.story === selectedStory);
+            // Scroll to top for capture
+            const originalScrollY = window.scrollY;
+            window.scrollTo(0, 0);
 
-                if (reportData.length === 0) {
-                    alert("Tidak ada data untuk story ini. Pastikan klasifikasi sudah muncul di layar.");
+            try {
+                // Ensure high resolution
+                html2canvas(element, { 
+                    scale: 3, 
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    scrollX: 0,
+                    scrollY: 0,
+                    width: element.offsetWidth,
+                    height: element.offsetHeight
+                }).then(canvas => {
+                    window.scrollTo(0, originalScrollY);
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('l', 'mm', 'a4');
+                    
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const margin = 10;
+                    const maxWidth = pageWidth - (margin * 2);
+                    const maxHeight = pageHeight - (margin * 2);
+                    
+                    const ratio = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
+                    const finalWidth = canvas.width * ratio;
+                    const finalHeight = canvas.height * ratio;
+                    
+                    // Add Title to PDF first
+                    pdf.setFontSize(18);
+                    pdf.setTextColor(30, 64, 175);
+                    pdf.setFont("helvetica", "bold");
+                    pdf.text(`Kano Analysis: ${selectedStory}`, margin, 15);
+                    
+                    // Place the captured image
+                    pdf.addImage(imgData, 'PNG', (pageWidth - finalWidth) / 2, 20, finalWidth, finalHeight);
+                    pdf.save(`Kano_Display_${selectedStory.replace(/\s+/g, '_')}.pdf`);
+                }).finally(() => {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
-                    return;
-                }
-
-                const exportArea = document.createElement('div');
-                exportArea.className = "bg-white p-16";
-                exportArea.style.width = "850px"; 
-                exportArea.style.position = "fixed";
-                exportArea.style.left = "-9999px";
-                exportArea.style.top = "0";
-                
-                exportArea.innerHTML = `
-                    <div style="border-bottom: 6px solid #1e40af; padding-bottom: 25px; margin-bottom: 45px; text-align: center;">
-                        <h1 style="font-size: 34px; font-weight: 900; color: #1e40af; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Kano Analysis Report</h1>
-                        <p style="color: #475569; font-size: 20px; margin: 12px 0 0 0; font-weight: 700;">Story Case: ${selectedStory}</p>
-                    </div>
-
-                    <h2 style="font-size: 26px; font-weight: 800; color: #1e40af; margin-bottom: 30px; border-left: 10px solid #1e40af; padding-left: 18px;">Daftar Klasifikasi Kebutuhan</h2>
-                    <table style="width: 100%; border-collapse: collapse; border: 3px solid #cbd5e1; font-size: 18px;">
-                        <thead>
-                            <tr style="background: #f1f5f9; height: 70px;">
-                                <th style="border: 3px solid #cbd5e1; padding: 20px; text-align: left; font-weight: 900; width: 85%;">Masalah & Fitur Solusi</th>
-                                <th style="border: 3px solid #cbd5e1; padding: 20px; text-align: center; font-weight: 900; width: 15%;">Kano</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${reportData.map((f, idx) => `
-                                <tr>
-                                    <td style="border: 3px solid #cbd5e1; padding: 28px;">
-                                        <div style="margin-bottom: 18px;">
-                                            <strong style="color: #ef4444; font-size: 14px; text-transform: uppercase; display: block; margin-bottom: 6px; font-weight: 800;">Identifikasi Masalah:</strong>
-                                            <div style="font-weight: 700; color: #0f172a; line-height: 1.6; font-size: 17px;">${f.problem}</div>
-                                        </div>
-                                        <div>
-                                            <strong style="color: #2563eb; font-size: 14px; text-transform: uppercase; display: block; margin-bottom: 6px; font-weight: 800;">Fitur Solusi:</strong>
-                                            <div style="font-weight: 700; color: #0f172a; line-height: 1.6; font-size: 17px;">${f.solution}</div>
-                                        </div>
-                                    </td>
-                                    <td style="border: 3px solid #cbd5e1; padding: 28px; text-align: center; vertical-align: middle;">
-                                        <div style="background: #1e40af; color: white; width: 65px; height: 65px; line-height: 65px; border-radius: 14px; font-size: 34px; font-weight: 900; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);">
-                                            ${f.category}
-                                        </div>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    <div style="margin-top: 60px; text-align: right; font-style: italic; color: #94a3b8; font-size: 13px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-                        Generated on ${new Date().toLocaleDateString('id-ID')} via Kano Framework Analysis System
-                    </div>
-                `;
-
-                document.body.appendChild(exportArea);
-
-                setTimeout(() => {
-                    html2canvas(exportArea, { 
-                        scale: 3, 
-                        useCORS: true,
-                        backgroundColor: '#ffffff'
-                    }).then(canvas => {
-                        const imgData = canvas.toDataURL('image/png');
-                        const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF('l', 'mm', 'a4');
-                        const pageWidth = pdf.internal.pageSize.getWidth();
-                        const pageHeight = pdf.internal.pageSize.getHeight();
-                        const ratio = Math.min((pageWidth - 20) / canvas.width, (pageHeight - 20) / canvas.height);
-                        const finalWidth = canvas.width * ratio;
-                        const finalHeight = canvas.height * ratio;
-                        pdf.addImage(imgData, 'PNG', (pageWidth - finalWidth) / 2, (pageHeight - finalHeight) / 2, finalWidth, finalHeight);
-                        pdf.save(`Kano_Report_${selectedStory.replace(/\s+/g, '_')}.pdf`);
-                    }).finally(() => {
-                        document.body.removeChild(exportArea);
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
-                    });
-                }, 400);
-
+                });
             } catch (err) {
                 alert("Kesalahan Ekspor: " + err.message);
                 btn.innerHTML = originalText;
