@@ -1138,8 +1138,13 @@
                 const allItems = await res.json();
                 
                 // Robust matching: Case-insensitive and strips all weird whitespace
-                const normalize = (s) => s ? s.toLowerCase().replace(/\s+/g, ' ').trim() : '';
-                const targetNorm = normalize(storyName);
+                const normalize = (s) => {
+                    if (!s || s.trim() === "") return "default_empty_story";
+                    return s.toLowerCase().replace(/\s+/g, ' ').trim();
+                };
+                
+                let targetNorm = normalize(storyName);
+                if (targetNorm === "all") targetNorm = "default_empty_story"; // Handle 'ALL' selection
                 
                 const targets = allItems.filter(i => normalize(i.story) === targetNorm);
 
