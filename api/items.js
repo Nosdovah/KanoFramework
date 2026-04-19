@@ -62,11 +62,29 @@ module.exports = async function handler(req, res) {
 
     let user_id;
     let isGuest = false;
+    let sharePermission = null;
 
     try {
         user_id = await authenticate(req);
     } catch (e) {
-        if (req.method === 'GET') {
+        // If not authenticated, check for share token
+        const { share_token } = req.query;
+        if (share_token) {
+            try {
+                const { rows } = await tursoQuery(
+                    "SELECT owner_id, permission FROM shared_projects WHERE share_token = ?",
+                    [share_token]
+                );
+                if (rows.length > 0) {
+                    user_id = rows[0].owner_id;
+                    sharePermission = rows[0].permission;
+                } else {
+                    isGuest = true;
+                }
+            } catch (err) {
+                isGuest = true;
+            }
+        } else if (req.method === 'GET') {
             isGuest = true;
         } else {
             return res.status(401).json({ error: e.message });
@@ -87,7 +105,9 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-        if (isGuest) return res.status(401).json({ error: "Please log in to add data" });
+        if (isGuest && sharePermission !== 'editor') {
+            return res.status(401).json({ error: "Please log in or use an editor link to add data" });
+        }
         
         const { problem, solution, relations, story_context } = req.body;
         try {

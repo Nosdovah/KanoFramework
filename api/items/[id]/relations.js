@@ -8,10 +8,24 @@ module.exports = async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     let user_id;
+    let sharePermission = null;
+
     try {
         user_id = await authenticate(req);
     } catch (e) {
-        return res.status(401).json({ error: e.message });
+        const { share_token } = req.query;
+        if (share_token) {
+            const { rows } = await tursoQuery("SELECT owner_id, permission FROM shared_projects WHERE share_token = ?", [share_token]);
+            if (rows.length > 0) {
+                user_id = rows[0].owner_id;
+                sharePermission = rows[0].permission;
+                if (sharePermission === 'viewer' || sharePermission === 'commenter') return res.status(403).json({ error: "No permission to edit" });
+            } else {
+                return res.status(401).json({ error: e.message });
+            }
+        } else {
+            return res.status(401).json({ error: e.message });
+        }
     }
 
     const { id } = req.query;

@@ -85,6 +85,24 @@ async function initDb() {
         } catch (e) {
             // Ignore error if column already exists
         }
+
+        // Add shared_projects table
+        await tursoQuery(`CREATE TABLE IF NOT EXISTS shared_projects (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            owner_id INTEGER,
+            share_token TEXT UNIQUE,
+            permission TEXT, -- 'viewer', 'commenter', 'editor'
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
+
+        // Add item_comments table
+        await tursoQuery(`CREATE TABLE IF NOT EXISTS item_comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            item_id INTEGER,
+            author_name TEXT,
+            content TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
     } catch (e) {
         console.error("Failed to initialize DB:", e.message);
     }
