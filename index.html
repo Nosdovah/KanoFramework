@@ -914,96 +914,89 @@
         }
 
         window.downloadKanoPDF = function() {
-            const listRoot = document.getElementById('feature-list-root');
-            const classRoot = document.getElementById('kano-classification-root');
-            
             if (!features || features.length === 0) {
                 alert("Belum ada data untuk diekspor!");
                 return;
             }
             
-            // Show loading state
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Generating PDF...';
             btn.disabled = true;
 
-            const listParent = listRoot.parentNode;
-            const listNext = listRoot.nextSibling;
-            const classParent = classRoot.parentNode;
-            const classNext = classRoot.nextSibling;
-            const wasClassHidden = classRoot.classList.contains('hidden');
+            // Helper for Kano Category
+            const getKanoCategory = (f, d) => {
+                const matrix = {
+                    'Suka': { 'Suka': 'Q', 'Harus Ada': 'A', 'Netral': 'A', 'Tidak Suka': 'A', 'Sangat Tidak Suka': 'O' },
+                    'Harus Ada': { 'Suka': 'R', 'Harus Ada': 'I', 'Netral': 'I', 'Tidak Suka': 'I', 'Sangat Tidak Suka': 'M' },
+                    'Netral': { 'Suka': 'R', 'Harus Ada': 'I', 'Netral': 'I', 'Tidak Suka': 'I', 'Sangat Tidak Suka': 'M' },
+                    'Tidak Suka': { 'Suka': 'R', 'Harus Ada': 'I', 'Netral': 'I', 'Tidak Suka': 'I', 'Sangat Tidak Suka': 'M' },
+                    'Sangat Tidak Suka': { 'Suka': 'R', 'Harus Ada': 'R', 'Netral': 'R', 'Tidak Suka': 'R', 'Sangat Tidak Suka': 'Q' }
+                };
+                return matrix[f]?.[d] || 'I';
+            };
 
             try {
-                // Create temporary container for export
                 const exportArea = document.createElement('div');
-                exportArea.className = "bg-white p-10 space-y-10";
-                exportArea.style.width = "1100px";
+                exportArea.className = "bg-white p-10";
+                exportArea.style.width = "1000px";
                 exportArea.style.position = "fixed";
                 exportArea.style.left = "-9999px";
-                exportArea.style.top = "0";
                 
+                // Get Chart Image
+                const kanoCanvas = document.querySelector('#kanoMap canvas');
+                const chartImg = kanoCanvas ? kanoCanvas.toDataURL('image/png') : null;
+
                 exportArea.innerHTML = `
-                    <div class="border-b-4 border-blue-900 pb-4 mb-8">
-                        <h1 class="text-3xl font-black text-blue-900">Kano Analysis Report</h1>
-                        <p class="text-slate-500 font-medium italic">Story Context: ${selectedStory}</p>
-                    </div>
-                    
-                    <div id="export-sec-1">
-                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                            <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-black">1</span>
-                            Daftar Hasil Identifikasi
-                        </h2>
+                    <div style="border-bottom: 3px solid #1e3a8a; padding-bottom: 15px; margin-bottom: 30px;">
+                        <h1 style="font-size: 24px; font-weight: 900; color: #1e3a8a; margin: 0;">Kano Analysis Report</h1>
+                        <p style="color: #64748b; font-size: 14px; margin: 5px 0 0 0;">Story: ${selectedStory}</p>
                     </div>
 
-                    <div id="export-sec-2">
-                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                            <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-black">2</span>
-                            Klasifikasi Kano & Pemetaan
-                        </h2>
+                    <h2 style="font-size: 18px; font-weight: 700; color: #334155; margin-bottom: 15px;">1. Klasifikasi Kano</h2>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 40px; font-size: 12px;">
+                        <thead>
+                            <tr style="background: #f1f5f9;">
+                                <th style="border: 1px solid #e2e8f0; padding: 10px; text-align: left;">Masalah & Solusi</th>
+                                <th style="border: 1px solid #e2e8f0; padding: 10px; text-align: center; width: 80px;">Kano</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${features.filter(f => f.story === selectedStory).map(f => `
+                                <tr>
+                                    <td style="border: 1px solid #e2e8f0; padding: 10px;">
+                                        <div style="color: #ef4444; font-weight: 800; font-size: 10px; text-transform: uppercase;">Masalah:</div>
+                                        <div style="margin-bottom: 8px; font-weight: 600;">${f.problem}</div>
+                                        <div style="color: #3b82f6; font-weight: 800; font-size: 10px; text-transform: uppercase;">Solusi:</div>
+                                        <div style="font-weight: 600;">${f.solution}</div>
+                                    </td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 10px; text-align: center; font-weight: 900; font-size: 18px; color: #1e3a8a;">
+                                        ${getKanoCategory(f.functional, f.dysfunctional)}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <h2 style="font-size: 18px; font-weight: 700; color: #334155; margin-bottom: 15px;">2. Kano Perceptual Map</h2>
+                    <div style="text-align: center; background: #f8fafc; padding: 20px; border-radius: 15px; border: 1px solid #e2e8f0;">
+                        ${chartImg ? `<img src="${chartImg}" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />` : '<p>Map tidak tersedia</p>'}
                     </div>
                 `;
 
                 document.body.appendChild(exportArea);
 
-                // MOVE REAL ELEMENTS into the export area (preserves canvas/state)
-                exportArea.querySelector('#export-sec-1').appendChild(listRoot);
-                exportArea.querySelector('#export-sec-2').appendChild(classRoot);
-                classRoot.classList.remove('hidden');
-
-                // Small delay to ensure browser acknowledges the move
                 setTimeout(() => {
-                    html2canvas(exportArea, { 
-                        scale: 1.5, 
-                        useCORS: true,
-                        backgroundColor: '#ffffff'
-                    }).then(canvas => {
+                    html2canvas(exportArea, { scale: 1.5, useCORS: true }).then(canvas => {
                         const imgData = canvas.toDataURL('image/png');
                         const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF({
-                            orientation: 'landscape',
-                            unit: 'mm',
-                            format: 'a4'
-                        });
-                        
+                        const pdf = new jsPDF('l', 'mm', 'a4');
                         const pageWidth = pdf.internal.pageSize.getWidth();
                         const pageHeight = pdf.internal.pageSize.getHeight();
-                        const margin = 10;
-                        const ratio = Math.min((pageWidth - (margin*2)) / canvas.width, (pageHeight - (margin*2)) / canvas.height);
-                        const finalWidth = canvas.width * ratio;
-                        const finalHeight = canvas.height * ratio;
-                        
-                        pdf.addImage(imgData, 'PNG', (pageWidth - finalWidth) / 2, (pageHeight - finalHeight) / 2, finalWidth, finalHeight);
+                        const ratio = Math.min((pageWidth - 20) / canvas.width, (pageHeight - 20) / canvas.height);
+                        pdf.addImage(imgData, 'PNG', (pageWidth - (canvas.width * ratio)) / 2, 10, canvas.width * ratio, canvas.height * ratio);
                         pdf.save(`Kano_Report_${selectedStory.replace(/\s+/g, '_')}.pdf`);
-                    }).catch(err => {
-                        console.error("PDF Error:", err);
-                        alert("PDF Error: " + err.message);
                     }).finally(() => {
-                        // RESTORE ELEMENTS back to their original spots
-                        listParent.insertBefore(listRoot, listNext);
-                        classParent.insertBefore(classRoot, classNext);
-                        if (wasClassHidden) classRoot.classList.add('hidden');
-                        
                         document.body.removeChild(exportArea);
                         btn.innerHTML = originalText;
                         btn.disabled = false;
@@ -1011,8 +1004,7 @@
                 }, 100);
 
             } catch (err) {
-                console.error("Global Error:", err);
-                alert("Global Error: " + err.message);
+                alert("Export failed: " + err.message);
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
