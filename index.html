@@ -906,6 +906,7 @@
                             </div>`;
                         }
                         return `<div class="bg-green-50 text-green-700 p-3 rounded-lg border border-green-200 text-xs font-bold flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i> Validasi: Total Prioritas HARUS 100% (Status: 100.0% Berhasil Direkalkulasi).
                         </div>`;
                     })()}
                 </div>
@@ -914,7 +915,7 @@
 
         window.downloadKanoPDF = function() {
             if (!features || features.length === 0) {
-                alert("Belum ada data untuk diekspor!");
+                alert("Selesaikan Klasifikasi Kano terlebih dahulu!");
                 return;
             }
             
@@ -923,46 +924,28 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Capturing...';
             btn.disabled = true;
 
-            // Robust Helper for Kano Category (Fuzzy Matching)
-            const getKanoCategory = (func, dys) => {
-                if (!func || !dys) return '-';
-                const f = func.toString().trim().toLowerCase();
-                const d = dys.toString().trim().toLowerCase();
-                
-                // Map common variations to standard keys
-                const mapKey = (val) => {
-                    if (val.includes('suka') && !val.includes('tidak')) return 'suka';
-                    if (val.includes('harus ada')) return 'harus ada';
-                    if (val.includes('netral')) return 'netral';
-                    if (val.includes('tidak suka') && !val.includes('sangat')) return 'tidak suka';
-                    if (val.includes('sangat tidak suka')) return 'sangat tidak suka';
-                    return val;
-                };
-
-                const fk = mapKey(f);
-                const dk = mapKey(d);
-                
-                const matrix = {
-                    'suka': { 'suka': 'Q', 'harus ada': 'A', 'netral': 'A', 'tidak suka': 'A', 'sangat tidak suka': 'O' },
-                    'harus ada': { 'suka': 'R', 'harus ada': 'I', 'netral': 'I', 'tidak suka': 'I', 'sangat tidak suka': 'M' },
-                    'netral': { 'suka': 'R', 'harus ada': 'I', 'netral': 'I', 'tidak suka': 'I', 'sangat tidak suka': 'M' },
-                    'tidak suka': { 'suka': 'R', 'harus ada': 'I', 'netral': 'I', 'tidak suka': 'I', 'sangat tidak suka': 'M' },
-                    'sangat tidak suka': { 'suka': 'R', 'harus ada': 'R', 'netral': 'R', 'tidak suka': 'R', 'sangat tidak suka': 'Q' }
-                };
-                
-                return matrix[fk]?.[dk] || 'I';
-            };
-
             try {
+                const reportData = features.filter(f => f.story === selectedStory).map(f => {
+                    const matrix = {
+                        'suka': { 'suka': 'Q', 'harus ada': 'A', 'netral': 'A', 'tidak suka': 'A', 'sangat tidak suka': 'O' },
+                        'harus ada': { 'suka': 'R', 'harus ada': 'I', 'netral': 'I', 'tidak suka': 'I', 'sangat tidak suka': 'M' },
+                        'netral': { 'suka': 'R', 'harus ada': 'I', 'netral': 'I', 'tidak suka': 'I', 'sangat tidak suka': 'M' },
+                        'tidak suka': { 'suka': 'R', 'harus ada': 'I', 'netral': 'I', 'tidak suka': 'I', 'sangat tidak suka': 'M' },
+                        'sangat tidak suka': { 'suka': 'R', 'harus ada': 'R', 'netral': 'R', 'tidak suka': 'R', 'sangat tidak suka': 'Q' }
+                    };
+                    const fk = (f.functional || 'Netral').toString().toLowerCase().trim();
+                    const dk = (f.dysfunctional || 'Netral').toString().toLowerCase().trim();
+                    const category = matrix[fk]?.[dk] || 'I';
+                    return { ...f, category };
+                });
+
                 const exportArea = document.createElement('div');
                 exportArea.className = "bg-white p-12";
-                // Narrower width (800px) means fonts will look LARGER when scaled to A4 Landscape (approx 1100px)
                 exportArea.style.width = "850px"; 
                 exportArea.style.position = "fixed";
                 exportArea.style.left = "-9999px";
                 exportArea.style.top = "0";
                 
-                // Get Map Canvas
                 const kanoCanvas = document.querySelector('#kanoMap canvas') || document.querySelector('.chartjs-render-monitor') || document.querySelector('canvas');
                 const chartImg = kanoCanvas ? kanoCanvas.toDataURL('image/png', 1.0) : null;
 
@@ -982,7 +965,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                ${features.filter(f => f.story === selectedStory).map((f, idx) => `
+                                ${reportData.map((f, idx) => `
                                     <tr>
                                         <td style="border: 2px solid #e2e8f0; padding: 20px;">
                                             <div style="margin-bottom: 12px;">
@@ -995,8 +978,8 @@
                                             </div>
                                         </td>
                                         <td style="border: 2px solid #e2e8f0; padding: 20px; text-align: center;">
-                                            <div style="background: #1e40af; color: white; width: 45px; height: 45px; line-height: 45px; border-radius: 8px; font-size: 26px; font-weight: 900; margin: 0 auto;">
-                                                ${getKanoCategory(f.functional, f.dysfunctional)}
+                                            <div style="background: #1e40af; color: white; width: 50px; height: 50px; line-height: 50px; border-radius: 10px; font-size: 28px; font-weight: 900; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                                                ${f.category}
                                             </div>
                                         </td>
                                     </tr>
@@ -1017,7 +1000,7 @@
 
                 setTimeout(() => {
                     html2canvas(exportArea, { 
-                        scale: 3, // Very high scale for crisp text
+                        scale: 3, 
                         useCORS: true,
                         backgroundColor: '#ffffff'
                     }).then(canvas => {
@@ -1032,13 +1015,13 @@
                         const finalHeight = canvas.height * ratio;
                         
                         pdf.addImage(imgData, 'PNG', (pageWidth - finalWidth) / 2, (pageHeight - finalHeight) / 2, finalWidth, finalHeight);
-                        pdf.save(`Kano_Thesis_Report_${selectedStory.replace(/\s+/g, '_')}.pdf`);
+                        pdf.save(`Kano_Report_${selectedStory.replace(/\s+/g, '_')}.pdf`);
                     }).finally(() => {
                         document.body.removeChild(exportArea);
                         btn.innerHTML = originalText;
                         btn.disabled = false;
                     });
-                }, 300);
+                }, 400);
 
             } catch (err) {
                 alert("Kesalahan: " + err.message);
