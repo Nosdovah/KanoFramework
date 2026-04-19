@@ -13,8 +13,8 @@ module.exports = async function handler(req, res) {
             const user_id = await authenticate(req);
             const { permission } = req.body;
             
-            if (!['viewer', 'commenter', 'editor'].includes(permission)) {
-                return res.status(400).json({ error: "Invalid permission level" });
+            if (permission !== 'viewer') {
+                return res.status(400).json({ error: "Only viewer permission is supported" });
             }
 
             const token = crypto.randomBytes(16).toString('hex');
