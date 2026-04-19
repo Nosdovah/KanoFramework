@@ -898,7 +898,20 @@
                             })()}
                         </tr>
                     </tfoot>
-                </table>`;
+                </table>
+                <div id="hoq-validation-msg" class="mt-4">
+                    ${(() => {
+                        const totalW = techWeights.reduce((sum, w) => sum + Math.abs(w), 0);
+                        if (totalW === 0) {
+                            return `<div class="bg-amber-50 text-amber-700 p-3 rounded-lg border border-amber-200 text-xs font-bold flex items-center gap-2">
+                                <i class="fas fa-info-circle"></i> Tolong isi hubungan (◎/○/△) untuk menghitung Prioritas.
+                            </div>`;
+                        }
+                        return `<div class="bg-green-50 text-green-700 p-3 rounded-lg border border-green-200 text-xs font-bold flex items-center gap-2">
+                            <i class="fas fa-check-circle"></i> Validasi: Total Prioritas HARUS 100% (Status: 100.0% Berhasil Direkalkulasi).
+                        </div>`;
+                    })()}
+                </div>`;
         }
 
         window.addEventListener('load', initApp);
