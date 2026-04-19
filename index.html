@@ -339,9 +339,14 @@
                     <!-- Daftar Hasil Identifikasi -->
                     <div class="flex justify-between items-center mb-4 border-b pb-2">
                         <h3 class="text-sm font-bold text-slate-700 uppercase tracking-tight">Daftar Hasil Identifikasi</h3>
-                        <select id="story-filter-step1" onchange="onStoryFilterStep1Change()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
-                            <option value="ALL">Semua Story</option>
-                        </select>
+                        <div class="flex items-center gap-2">
+                            <select id="story-filter-step1" onchange="onStoryFilterStep1Change()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
+                                <option value="ALL">Semua Story</option>
+                            </select>
+                            <button id="delete-story-step1" onclick="deleteCurrentStory('step1')" class="hidden bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded border border-red-200 transition-all" title="Hapus semua item dalam story ini">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
                     </div>
                     <div id="feature-list" class="space-y-3">
                         <!-- Data Masalah & Solusi akan muncul di sini -->
@@ -414,6 +419,9 @@
                                 <select id="story-filter-hoq" onchange="onStoryFilterHoQChange()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
                                     <!-- Options will be populated by JS without 'Semua Story' -->
                                 </select>
+                                <button id="delete-story-hoq" onclick="deleteCurrentStory('hoq')" class="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded border border-red-200 transition-all" title="Hapus semua item dalam story ini">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1102,6 +1110,74 @@
                 btn.disabled = false;
             });
         }
+
+        async function deleteCurrentStory(source) {
+            const selectId = source === 'step1' ? 'story-filter-step1' : 'story-filter-hoq';
+            const storyName = document.getElementById(selectId).value;
+
+            if (!storyName || storyName === 'ALL') {
+                alert("Silakan pilih story spesifik terlebih dahulu.");
+                return;
+            }
+
+            if (!confirm(`PERINGATAN: Anda akan menghapus SEMUA data untuk story "${storyName}".\n\nTindakan ini tidak dapat dibatalkan. Lanjutkan?`)) {
+                return;
+            }
+
+            try {
+                // Show loading state
+                const btn = document.getElementById(`delete-story-${source}`);
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+
+                // Find items to delete
+                const res = await fetch(`${API_URL}/items`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const allItems = await res.json();
+                const targets = allItems.filter(i => i.story && i.story.trim() === storyName.trim());
+
+                if (targets.length === 0) {
+                    alert("Tidak ada item ditemukan untuk story ini.");
+                } else {
+                    for (const item of targets) {
+                        await fetch(`${API_URL}/items/${item.id}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                    }
+                    alert(`Berhasil menghapus ${targets.length} item untuk story "${storyName}".`);
+                }
+
+                // Refresh app
+                await loadData();
+                if (source === 'step1') {
+                    onStoryFilterStep1Change();
+                } else {
+                    onStoryFilterHoQChange();
+                }
+
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            } catch (err) {
+                console.error(err);
+                alert("Gagal menghapus story: " + err.message);
+            }
+        }
+
+        // Update step 1 filter change to show/hide delete button
+        const originalOnStoryFilterStep1Change = window.onStoryFilterStep1Change;
+        window.onStoryFilterStep1Change = function() {
+            const val = document.getElementById('story-filter-step1').value;
+            const delBtn = document.getElementById('delete-story-step1');
+            if (val && val !== 'ALL' && !isGuest) {
+                delBtn.classList.remove('hidden');
+            } else {
+                delBtn.classList.add('hidden');
+            }
+            if (originalOnStoryFilterStep1Change) originalOnStoryFilterStep1Change();
+        };
 
         window.addEventListener('load', initApp);
     </script>
