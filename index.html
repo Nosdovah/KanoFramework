@@ -38,9 +38,13 @@
 
         /* Diagonal labels for Technical Requirements */
         .vertical-text {
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
+            display: block;
             white-space: nowrap;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            width: 100%;
+            text-align: left;
+            padding-left: 10px;
         }
 
         .kano-label-A {
