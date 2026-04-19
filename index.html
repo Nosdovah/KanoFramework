@@ -122,13 +122,17 @@
                         <h1 class="text-lg font-extrabold tracking-tight">QFD <span class="text-blue-400 hidden sm:inline">System</span></h1>
                     </div>
                     
-                    <div id="guest-alert" class="hidden flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-2 sm:px-3 py-1 rounded-full text-amber-500 text-[10px] font-black uppercase tracking-widest">
+                    <div id="status-alert" class="hidden flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-2 sm:px-3 py-1 rounded-full text-amber-500 text-[10px] font-black uppercase tracking-widest">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
                         </span>
-                        <span class="hidden sm:inline">Guest Mode</span>
+                        <span id="status-text" class="hidden sm:inline">Guest Mode</span>
                     </div>
+
+                    <button id="back-to-edit" onclick="backToEditMode()" class="hidden bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-400/30 px-3 py-1 rounded-full text-[10px] font-black uppercase transition-all">
+                        <i class="fas fa-undo-alt mr-1"></i> Back to Edit
+                    </button>
                 </div>
 
                 <!-- Right: Navigation & Auth -->
@@ -564,6 +568,12 @@
 
         async function initApp() {
             try {
+                // Show Guest Mode by default if no token
+                if (!token && !currentShareToken) {
+                    const alert = document.getElementById('status-alert');
+                    if (alert) alert.classList.remove('hidden');
+                }
+
                 if (currentShareToken) {
                     await verifyShareToken();
                 }
@@ -582,10 +592,25 @@
                 currentRole = data.permission;
                 console.log("🔓 Accessing via share link. Role:", currentRole);
                 
-                // Hide edit-only features for viewers/commenters
-                if (currentRole === 'viewer' || currentRole === 'commenter') {
-                    document.body.classList.add('read-only-mode');
+                // UI Updates for Viewer Mode
+                const statusAlert = document.getElementById('status-alert');
+                const statusText = document.getElementById('status-text');
+                const backBtn = document.getElementById('back-to-edit');
+
+                if (statusAlert) {
+                    statusAlert.classList.remove('hidden');
+                    statusText.innerText = "Viewer Mode";
+                    statusAlert.classList.replace('text-amber-500', 'text-blue-400');
+                    statusAlert.classList.replace('bg-amber-500/10', 'bg-blue-500/10');
+                    statusAlert.classList.replace('border-amber-500/20', 'border-blue-500/20');
                 }
+
+                if (backBtn && token) {
+                    backBtn.classList.remove('hidden');
+                }
+                
+                // Hide edit-only features for viewers
+                document.body.classList.add('read-only-mode');
             } catch (err) {
                 // alert(err.message);
                 currentShareToken = null;
@@ -1387,6 +1412,10 @@
             input.select();
             document.execCommand('copy');
             alert("Link berhasil disalin!");
+        };
+
+        window.backToEditMode = () => {
+            window.location.href = window.location.pathname;
         };
 
         window.addEventListener('load', initApp);
