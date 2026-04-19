@@ -870,7 +870,8 @@
                         <tr class="bg-white font-bold">
                             <td colspan="2" class="text-right px-4 uppercase text-slate-400">Prioritas (%)</td>
                             ${(() => {
-                                if (totalWeight === 0) {
+                                const isAllZero = techWeights.every(w => Math.abs(w) < 0.001);
+                                if (isAllZero || totalWeight <= 0) {
                                     return techWeights.map(() => `<td class="text-slate-400">0.0%</td>`).join('');
                                 }
                                 
