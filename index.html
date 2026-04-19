@@ -318,7 +318,7 @@
                     </div>
 
                     <!-- Form Input Masalah & Solusi -->
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8" data-html2canvas-ignore="true">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 edit-only" data-html2canvas-ignore="true">
                         <div class="grid grid-cols-1 gap-4">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Story Context / Title</label>
@@ -349,10 +349,10 @@
                             <select id="story-filter-step1" onchange="onStoryFilterStep1Change()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
                                 <option value="ALL">Semua Story</option>
                             </select>
-                            <button id="delete-story-step1" onclick="deleteCurrentStory('step1')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg border border-red-200 transition-all flex items-center gap-2 text-xs font-bold" title="Hapus story yang dipilih">
+                            <button id="delete-story-step1" onclick="deleteCurrentStory('step1')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg border border-red-200 transition-all flex items-center gap-2 text-xs font-bold edit-only" title="Hapus story yang dipilih">
                                 <i class="fas fa-trash-alt"></i> Hapus Story
                             </button>
-                            <button onclick="deleteAllData()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-md" title="Hapus SEMUA data di database">
+                            <button onclick="deleteAllData()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-md edit-only" title="Hapus SEMUA data di database">
                                 <i class="fas fa-exclamation-triangle"></i> DELETE ALL
                             </button>
                         </div>
@@ -623,8 +623,7 @@
                 
                 // Hide edit-only features for viewers/commenters
                 if (currentRole === 'viewer' || currentRole === 'commenter') {
-                    document.getElementById('studi-kasus').classList.add('read-only-mode');
-                    // We'll handle more granular UI hiding in render functions
+                    document.body.classList.add('read-only-mode');
                 }
             } catch (err) {
                 alert(err.message);
