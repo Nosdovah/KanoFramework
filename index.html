@@ -569,19 +569,17 @@
         console.log("📍 Deobfuscated share token:", currentShareToken);
         let currentRole = 'owner'; // 'owner', 'editor', 'commenter', 'viewer'
 
-        // INSTANT UI SYNC
+        // INSTANT UI SYNC (Runs immediately as elements are already in DOM above this script)
         if (currentShareToken) {
             document.body.classList.add('read-only-mode');
-            window.addEventListener('DOMContentLoaded', () => {
-                const statusAlert = document.getElementById('status-alert');
-                const statusText = document.getElementById('status-text');
-                if (statusAlert) {
-                    statusAlert.classList.remove('hidden');
-                    if (statusText) statusText.innerText = "Viewer Mode";
-                    statusAlert.classList.remove('text-amber-500', 'bg-amber-500/10', 'border-amber-500/20');
-                    statusAlert.classList.add('text-blue-400', 'bg-blue-500/10', 'border-blue-500/20');
-                }
-            });
+            const statusAlert = document.getElementById('status-alert');
+            const statusText = document.getElementById('status-text');
+            if (statusAlert) {
+                statusAlert.classList.remove('hidden');
+                if (statusText) statusText.innerText = "Viewer Mode";
+                statusAlert.classList.remove('text-amber-500', 'bg-amber-500/10', 'border-amber-500/20');
+                statusAlert.classList.add('text-blue-400', 'bg-blue-500/10', 'border-blue-500/20');
+            }
         }
 
         async function initApp() {
@@ -722,8 +720,17 @@
         }
 
         window.switchTab = function (tabId) {
+            console.log("📑 Switching to tab:", tabId);
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
+            
+            // Update button visual states
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-700', 'text-white');
+            });
+            const activeBtn = document.querySelector(`[onclick="switchTab('${tabId}')"]`);
+            if (activeBtn) activeBtn.classList.add('bg-slate-700', 'text-white');
+
             if (tabId === 'hoq-module') renderHoQ();
         }
 
