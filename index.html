@@ -1137,19 +1137,20 @@
                 });
                 const allItems = await res.json();
                 
-                // Robust matching: Case-insensitive and strips all weird whitespace
+                // Robust matching: Case-insensitive and handles "Default" vs empty strings
                 const normalize = (s) => {
-                    if (!s || s.trim() === "" || s.toLowerCase().trim() === "default") return "default_empty_story";
-                    return s.toLowerCase().replace(/\s+/g, ' ').trim();
+                    const val = s ? s.trim().toLowerCase() : "";
+                    if (val === "" || val === "default" || val === "default_empty_story" || val === "all") {
+                        return "___EMPTY_STORY_PLACEHOLDER___";
+                    }
+                    return val.replace(/\s+/g, ' ');
                 };
                 
-                let targetNorm = normalize(storyName);
-                if (targetNorm === "all") targetNorm = "default_empty_story";
-                
+                const targetNorm = normalize(storyName);
                 const targets = allItems.filter(i => normalize(i.story) === targetNorm);
 
-                console.log(`🔍 Debug: Target story "${targetNorm}"`);
-                console.log(`📊 Found ${targets.length} matches out of ${allItems.length} total items.`);
+                console.log(`🎯 Target Story: "${storyName}" (Normalized: ${targetNorm})`);
+                console.log(`📊 Found ${targets.length} items to delete.`);
 
                 if (targets.length === 0) {
                     // Log unique stories found in DB to help debug
