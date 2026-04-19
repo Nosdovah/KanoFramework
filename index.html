@@ -506,27 +506,15 @@
         const isGuest = !token;
 
         if (isGuest) {
-            document.getElementById('guest-alert').classList.remove('hidden');
-            document.getElementById('guest-buttons').classList.remove('hidden');
-            document.getElementById('auth-buttons').classList.add('hidden');
+            const statusAlert = document.getElementById('status-alert');
+            if (statusAlert) statusAlert.classList.remove('hidden');
+            
+            const guestBtns = document.getElementById('guest-buttons');
+            if (guestBtns) guestBtns.classList.remove('hidden');
+            
+            const authBtns = document.getElementById('auth-buttons');
+            if (authBtns) authBtns.classList.add('hidden');
         }
-
-        const originalFetch = window.fetch;
-        window.fetch = async function() {
-            let [resource, config] = arguments;
-            if(resource.toString().startsWith('/api')) {
-                config = config || {};
-                config.headers = config.headers || {};
-                if (token) {
-                    config.headers['Authorization'] = `Bearer ${token}`;
-                }
-            }
-            const response = await originalFetch(resource, config);
-            if(response.status === 401 && token) {
-                logout();
-            }
-            return response;
-        };
 
         function logout() {
             localStorage.removeItem('auth_token');
@@ -534,7 +522,9 @@
             window.location.href = 'login.html';
         }
 
-        const API_URL = "/api";
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:3000/api'
+            : '/api';
 
         let features = [];
         let kanoData = [];
