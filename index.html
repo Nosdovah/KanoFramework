@@ -901,7 +901,7 @@
                         </tr>
                     </tfoot>
                 </table>
-                <div id="hoq-validation-msg" class="mt-4">
+                <div id="hoq-validation-msg" class="mt-4" data-html2canvas-ignore="true">
                     ${(() => {
                         const totalW = techWeights.reduce((sum, w) => sum + Math.abs(w), 0);
                         if (totalW === 0) {
@@ -923,11 +923,12 @@
                 return;
             }
             const opt = {
-                margin: [10, 10, 10, 10],
+                margin: [10, 5, 10, 5],
                 filename: `Kano_Analysis_${selectedStory.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+                pagebreak: { mode: 'avoid-all' }
             };
             html2pdf().from(element).set(opt).save();
         }
@@ -939,11 +940,12 @@
                 return;
             }
             const opt = {
-                margin: [10, 10, 10, 10],
+                margin: [10, 5, 10, 5],
                 filename: `House_of_Quality_${selectedStoryHoQ.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                html2canvas: { scale: 1.5, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+                pagebreak: { mode: 'avoid-all' }
             };
             html2pdf().from(element).set(opt).save();
         }
