@@ -560,36 +560,44 @@
         // OBFUSCATION HELPERS
         const obfuscate = (str) => btoa(str).replace(/=/g, '');
         const deobfuscate = (str) => {
+            if (!str || str === 'null') return null;
             try { return atob(str); } catch { return str; }
         };
 
         let currentShareToken = deobfuscate(new URLSearchParams(window.location.search).get('s'));
+        console.log("📍 Raw share token from URL:", new URLSearchParams(window.location.search).get('s'));
+        console.log("📍 Deobfuscated share token:", currentShareToken);
         let currentRole = 'owner'; // 'owner', 'editor', 'commenter', 'viewer'
 
         async function initApp() {
+            console.log("🚀 Initializing QFD App...");
             try {
                 // Show Guest Mode by default if no token
                 if (!token && !currentShareToken) {
-                    const alert = document.getElementById('status-alert');
-                    if (alert) alert.classList.remove('hidden');
+                    const alertEl = document.getElementById('status-alert');
+                    if (alertEl) alertEl.classList.remove('hidden');
                 }
 
                 if (currentShareToken) {
+                    console.log("🔗 Share token detected, verifying...");
                     await verifyShareToken();
                 }
                 await loadData();
             } catch (e) {
-                console.error("Error initializing app:", e);
-                alert("Gagal terhubung ke backend. Pastikan server berjalan.");
+                console.error("❌ Fatal Error in initApp:", e);
             }
         }
 
         async function verifyShareToken() {
+            console.log("🔍 Verifying share token:", currentShareToken);
             try {
                 const res = await fetch(`${API_URL}/share?token=${currentShareToken}`);
-                if (!res.ok) throw new Error("Link share tidak valid atau sudah kedaluwarsa.");
+                if (!res.ok) {
+                    console.warn("⚠️ Share token invalid or expired");
+                    throw new Error("Invalid token");
+                }
                 const data = await res.json();
-                currentRole = data.permission;
+                currentRole = data.permission || 'viewer';
                 console.log("🔓 Accessing via share link. Role:", currentRole);
                 
                 // UI Updates for Viewer Mode
@@ -599,10 +607,11 @@
 
                 if (statusAlert) {
                     statusAlert.classList.remove('hidden');
-                    statusText.innerText = "Viewer Mode";
-                    statusAlert.classList.replace('text-amber-500', 'text-blue-400');
-                    statusAlert.classList.replace('bg-amber-500/10', 'bg-blue-500/10');
-                    statusAlert.classList.replace('border-amber-500/20', 'border-blue-500/20');
+                    if (statusText) statusText.innerText = "Viewer Mode";
+                    // Robust color change
+                    statusAlert.classList.remove('text-amber-500', 'bg-amber-500/10', 'border-amber-500/20');
+                    statusAlert.classList.add('text-blue-400', 'bg-blue-500/10', 'border-blue-500/20');
+                    console.log("✅ UI Updated to Viewer Mode");
                 }
 
                 if (backBtn && token) {
@@ -612,9 +621,10 @@
                 // Hide edit-only features for viewers
                 document.body.classList.add('read-only-mode');
             } catch (err) {
-                // alert(err.message);
+                console.error("❌ verifyShareToken failed:", err);
                 currentShareToken = null;
-                window.history.replaceState({}, document.title, window.location.pathname);
+                // Optional: remove invalid token from URL without reload
+                // window.history.replaceState({}, document.title, window.location.pathname);
             }
         }
 
