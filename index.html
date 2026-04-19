@@ -829,7 +829,7 @@
                     return sum + (imp * relScores[relations[fIdx][tIdx]]);
                 }, 0)
             );
-            const maxWeight = Math.max(...techWeights, 1);
+            const totalWeight = techWeights.reduce((sum, w) => sum + Math.abs(w), 0) || 1;
             container.innerHTML = `
                 <div class="hoq-roof"></div>
                 <table class="hoq-table w-full text-[11px]">
@@ -870,8 +870,8 @@
                         <tr class="bg-white font-bold">
                             <td colspan="2" class="text-right px-4 uppercase text-slate-400">Prioritas (%)</td>
                             ${techWeights.map(w => {
-                                const val = w === 0 ? 0 : (w/maxWeight)*100;
-                                return `<td class="${w < 0 ? 'text-red-500' : ''}">${val.toFixed(0)}%</td>`;
+                                const val = (w / totalWeight) * 100;
+                                return `<td class="${w < 0 ? 'text-red-500' : ''}">${val.toFixed(1)}%</td>`;
                             }).join('')}
                         </tr>
                     </tfoot>

@@ -1,2 +1,5 @@
 node_modules
 .env
+
+Data_input.json
+import_script.js
