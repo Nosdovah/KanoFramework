@@ -838,10 +838,14 @@
                             <th class="row-header w-48">MASALAH &amp; FITUR &rarr;</th>
                             <th class="w-12 bg-slate-200">Kano</th>
                             ${technicalRequirements.map(tr => `<th class="h-32 p-0 w-12"><div class="vertical-text mx-auto font-bold text-slate-600">${tr}</div></th>`).join('')}
+                            <th class="w-16 bg-slate-100 font-black text-blue-900 border-l-2 border-slate-300">SUM</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${validIndices.map(fIdx => `
+                        ${validIndices.map(fIdx => {
+                            const rowSum = technicalRequirements.reduce((sum, _, tIdx) => 
+                                sum + (kanoWeights[kanoData[fIdx].category] * relScores[relations[fIdx][tIdx]]), 0);
+                            return `
                             <tr>
                                 <td class="row-header">
                                     <div class="text-[8px] font-black text-blue-500 uppercase tracking-widest mb-1 opacity-60">Story: ${features[fIdx].story}</div>
@@ -860,19 +864,23 @@
                                         <option value="weak" ${val==='weak'?'selected':''}>△</option>
                                     </select></td>`;
                                 }).join('')}
-                            </tr>`).join('')}
+                                <td class="bg-slate-50 font-bold text-blue-900 border-l-2 border-slate-300">${rowSum}</td>
+                            </tr>`;
+                        }).join('')}
                     </tbody>
                     <tfoot>
                         <tr class="bg-slate-50 font-bold">
                             <td colspan="2" class="text-right px-4 uppercase text-slate-500">Raw Weight (Σ)</td>
                             ${techWeights.map(w => `<td class="text-blue-800 text-sm">${w}</td>`).join('')}
+                            <td class="bg-blue-900 text-white text-sm border-l-2 border-blue-800">${totalWeight}</td>
                         </tr>
                         <tr class="bg-white font-bold">
                             <td colspan="2" class="text-right px-4 uppercase text-slate-400">Prioritas (%)</td>
                             ${(() => {
                                 const isAllZero = techWeights.every(w => Math.abs(w) < 0.001);
                                 if (isAllZero || totalWeight <= 0) {
-                                    return techWeights.map(() => `<td class="text-slate-400">0.0%</td>`).join('');
+                                    return techWeights.map(() => `<td class="text-slate-400">0.0%</td>`).join('') + 
+                                           `<td class="bg-slate-100 text-slate-400 border-l-2 border-slate-300">0.0%</td>`;
                                 }
                                 
                                 const rounded = techWeights.map(w => parseFloat(((w / totalWeight) * 100).toFixed(1)));
@@ -886,7 +894,7 @@
                                 
                                 return rounded.map((p, i) => 
                                     `<td class="${techWeights[i] < 0 ? 'text-red-500' : ''}">${p.toFixed(1)}%</td>`
-                                ).join('');
+                                ).join('') + `<td class="bg-slate-100 text-blue-900 border-l-2 border-slate-300">100.0%</td>`;
                             })()}
                         </tr>
                     </tfoot>
