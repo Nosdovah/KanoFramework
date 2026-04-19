@@ -1139,12 +1139,12 @@
                 
                 // Robust matching: Case-insensitive and strips all weird whitespace
                 const normalize = (s) => {
-                    if (!s || s.trim() === "") return "default_empty_story";
+                    if (!s || s.trim() === "" || s.toLowerCase().trim() === "default") return "default_empty_story";
                     return s.toLowerCase().replace(/\s+/g, ' ').trim();
                 };
                 
                 let targetNorm = normalize(storyName);
-                if (targetNorm === "all") targetNorm = "default_empty_story"; // Handle 'ALL' selection
+                if (targetNorm === "all") targetNorm = "default_empty_story";
                 
                 const targets = allItems.filter(i => normalize(i.story) === targetNorm);
 
