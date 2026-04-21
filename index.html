@@ -349,10 +349,10 @@
                     <!-- Daftar Hasil Identifikasi -->
                     <div class="flex justify-between items-center mb-4 border-b pb-2">
                         <h3 class="text-sm font-bold text-slate-700 uppercase tracking-tight">Daftar Hasil Identifikasi</h3>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-end gap-3">
                             <div class="flex flex-col gap-1">
-                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Dropdown Menu</label>
-                                <select id="story-filter-step1" onchange="onStoryFilterStep1Change()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
+                                <label class="text-[10px] font-black text-blue-500/60 uppercase tracking-wider ml-1">Dropdown Menu</label>
+                                <select id="story-filter-step1" onchange="onStoryFilterStep1Change()" class="text-xs p-2.5 border-2 border-slate-100 rounded-xl bg-white outline-none font-bold text-blue-600 min-w-[200px] shadow-sm hover:border-blue-200 transition-all">
                                     <option value="ALL">Semua Story</option>
                                 </select>
                             </div>
@@ -383,8 +383,8 @@
                                 <i class="fas fa-file-pdf mr-1"></i> PDF
                             </button>
                             <div class="flex flex-col gap-1">
-                                <label class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Dropdown Menu</label>
-                                <select id="story-filter" onchange="onStoryFilterChange()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
+                                <label class="text-[10px] font-black text-blue-500/60 uppercase tracking-wider ml-1">Dropdown Menu</label>
+                                <select id="story-filter" onchange="onStoryFilterChange()" class="text-xs p-2.5 border-2 border-slate-100 rounded-xl bg-white outline-none font-bold text-blue-600 min-w-[200px] shadow-sm hover:border-blue-200 transition-all">
                                     <option value="ALL">Semua Story</option>
                                 </select>
                             </div>
@@ -433,12 +433,12 @@
                             <button onclick="downloadHoQPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-md mr-2" data-html2canvas-ignore="true">
                                 <i class="fas fa-file-pdf mr-2"></i> Download PDF
                             </button>
-                            <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border shadow-sm">
+                            <div class="flex items-end gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 shadow-sm">
                                 <div class="flex flex-col gap-1">
-                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Dropdown Menu</label>
-                                    <div class="flex items-center gap-2">
-                                        <label class="text-[10px] font-bold text-slate-500 uppercase">Filter Story:</label>
-                                        <select id="story-filter-hoq" onchange="onStoryFilterHoQChange()" class="text-xs p-2 border rounded bg-white outline-none font-bold text-blue-600 min-w-[180px]">
+                                    <label class="text-[10px] font-black text-blue-500/60 uppercase tracking-wider ml-1">Dropdown Menu</label>
+                                    <div class="flex items-center gap-3">
+                                        <label class="text-xs font-bold text-slate-600 uppercase">Filter Story:</label>
+                                        <select id="story-filter-hoq" onchange="onStoryFilterHoQChange()" class="text-xs p-2.5 border-2 border-white rounded-xl bg-white outline-none font-bold text-blue-600 min-w-[200px] shadow-sm hover:border-blue-200 transition-all">
                                             <!-- Options will be populated by JS without 'Semua Story' -->
                                         </select>
                                     </div>
@@ -894,16 +894,16 @@
                         <div id="badge-${i}" class="text-[9px] px-2 py-0.5 rounded border uppercase font-black bg-white">UNCLASSIFIED</div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-3">
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Dropdown Menu</label>
-                            <select ${isGuest ? 'disabled' : ''} onchange="updateKano(${i}, 'f', this.value)" class="text-[11px] p-2 border rounded bg-white outline-none w-full">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest ml-1">Dropdown Menu</label>
+                            <select ${isGuest ? 'disabled' : ''} onchange="updateKano(${i}, 'f', this.value)" class="text-[11px] p-3 border-2 border-white rounded-xl bg-white outline-none w-full shadow-sm font-bold text-slate-700 hover:border-blue-200 transition-all">
                                 <option value="">Jika fitur ADA...</option>
                                 ${opts.map(o => `<option value="${o}" ${kanoData[i].f === o ? 'selected' : ''}>${o}</option>`).join('')}
                             </select>
                         </div>
-                        <div class="flex flex-col gap-1">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Dropdown Menu</label>
-                            <select ${isGuest ? 'disabled' : ''} onchange="updateKano(${i}, 'd', this.value)" class="text-[11px] p-2 border rounded bg-white outline-none w-full">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest ml-1">Dropdown Menu</label>
+                            <select ${isGuest ? 'disabled' : ''} onchange="updateKano(${i}, 'd', this.value)" class="text-[11px] p-3 border-2 border-white rounded-xl bg-white outline-none w-full shadow-sm font-bold text-slate-700 hover:border-blue-200 transition-all">
                                 <option value="">Jika fitur TIDAK ADA...</option>
                                 ${opts.map(o => `<option value="${o}" ${kanoData[i].d === o ? 'selected' : ''}>${o}</option>`).join('')}
                             </select>
@@ -1102,15 +1102,20 @@
                                     const val = relations[fIdx][tIdx];
                                     const sym = val === 'strong' ? '◎' : val === 'medium' ? '○' : val === 'weak' ? '△' : '';
                                     if (isGuest) return `<td class="text-center font-bold text-2xl" style="vertical-align: middle; padding: 10px; border: 1px solid #e2e8f0;">${sym}</td>`;
-                                    return `<td class="p-1" style="vertical-align: middle; border: 1px solid #e2e8f0;">
-                                        <div class="flex flex-col items-center gap-0">
-                                            <label class="text-[7px] font-black text-slate-400 uppercase tracking-tighter leading-none mb-1">Dropdown</label>
-                                            <select onchange="setRelation(${fIdx},${tIdx},this.value)" class="w-full h-full bg-transparent text-center outline-none font-bold text-2xl appearance-none cursor-pointer">
-                                                <option value="none" ${val==='none'?'selected':''}> </option>
-                                                <option value="strong" ${val==='strong'?'selected':''}>◎</option>
-                                                <option value="medium" ${val==='medium'?'selected':''}>○</option>
-                                                <option value="weak" ${val==='weak'?'selected':''}>△</option>
-                                            </select>
+                                    return `<td class="p-2" style="vertical-align: middle; border: 1px solid #e2e8f0;">
+                                        <div class="flex flex-col items-center gap-1">
+                                            <label class="text-[9px] font-black text-blue-400 uppercase tracking-widest leading-none">Dropdown</label>
+                                            <div class="relative w-full">
+                                                <select onchange="setRelation(${fIdx},${tIdx},this.value)" class="w-full h-full bg-slate-50/50 rounded-lg text-center outline-none font-bold text-2xl appearance-none cursor-pointer hover:bg-blue-50 transition-all py-1">
+                                                    <option value="none" ${val==='none'?'selected':''}> </option>
+                                                    <option value="strong" ${val==='strong'?'selected':''}>◎</option>
+                                                    <option value="medium" ${val==='medium'?'selected':''}>○</option>
+                                                    <option value="weak" ${val==='weak'?'selected':''}>△</option>
+                                                </select>
+                                                <div class="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none opacity-20">
+                                                    <i class="fas fa-chevron-down text-[8px]"></i>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>`;
                                 }).join('')}
